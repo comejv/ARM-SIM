@@ -1,0 +1,13 @@
+MEMORY
+  {
+    rom (rx)   : ORIGIN = 0x20, LENGTH = 4K
+    data_rom (r)   : ORIGIN = 5K, LENGTH = 4K
+    ram (wi) : ORIGIN = 10K, LENGTH = 8K
+  }
+
+SECTIONS
+  {
+    .text : { *(.text) } > rom
+    .data : { *(.data) } > ram
+    .rodata : { *(.rodata) } > data_rom
+  }
