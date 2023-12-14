@@ -24,7 +24,7 @@ the simulator prints on the screen the ports numbers on which it listens for
 these connections.
 
 To use the simulator, you must connect to it a gdb client:
-```bash
+```gdb
 arm-none-eabi-gdb
 file Examples/foo (for instance)
 target remote localhost:<port number given by the simulator>
