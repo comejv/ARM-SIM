@@ -1,5 +1,3 @@
-# ARM-SIM
-
 # ARMv5 Instruction Set Simulator
 
 ## Description
