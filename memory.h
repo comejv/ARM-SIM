@@ -25,94 +25,114 @@ Contact: Guillaume.Huard@imag.fr
 #include <stdint.h>
 #include <sys/types.h>
 
-/*
-A heap memory type
-- size: the size of memory
-- data: uint8_t pointer to the beginning of memory
-*/
+/**
+ * A memory object.
+ * It contains a size and a pointer to the data.
+ * The data is stored as an array of bytes.
+ */
 typedef struct memory_data *memory;
 
-/*
-Create a memory pointer with a given size. Uses Little Endian by default.
-Data: - size: the desired memory size
-Return: the allocated and created memory
-Side Effect: memory allocation
-*/
+/**
+ * Creates a memory object of a given size.
+ *
+ * @param size The size of the memory object to create.
+ * @return The created memory object.
+ */
 memory memory_create(size_t size);
 
-/*
-Return the size of a given memory_data
-Data: - mem: the memory whose size is to be retrieved
-Return: the size of mem memory_data
-Side Effect: none
-*/
+/**
+ * Returns the size of a memory object.
+ *
+ * @param mem The memory object to get the size of.
+ * @return The size of the memory object.
+ */
 size_t memory_get_size(memory mem);
 
-/*
-Destroy a given memory object
-Data: - mem: the memory to be destroyed
-Return: none
-Side Effect: memory deallocation
-*/
+/**
+ * Destroys a memory object.
+ *
+ * @param mem The memory object to destroy.
+ * @return void
+ */
 void memory_destroy(memory mem);
 
-/* All these functions perform a read/write access to a byte/half/word data at
+/* All the following functions perform a read/write access to a byte/half/word data at
  * address a in mem. The result is respectively taken from or stored to the
  * parameter value. The access is made using the given endianness (be == 1 for a
  * big endian access and be == 0 for a little endian access).
  * The return value indicates a succes (0) or a failure (-1).
  */
 
-/*
-Read a byte to mem at a given address
-Data: - mem: the memory to be read from
-	  - address: the address to be read from
-	  - value: the value to be set
-*/
-int memory_read_byte(memory mem, uint32_t address, uint8_t * value);
+/**
+ * Reads a byte from a memory object at a given address.
+ *
+ * @param mem The memory object to read from.
+ * @param address The address to read from.
+ * @param value Pointer to a byte where the read value will be stored.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
+int memory_read_byte(memory mem, uint32_t address, uint8_t *value);
 
-/*
-Read a half word to mem at a given address using a given endianness
-Data: - mem: the memory to be read from
-	  - address: the address to be read from
-	  - value: the value to be set
-	  - be: the endianess to be used
-*/
-int memory_read_half(memory mem, uint32_t address, uint16_t * value, uint8_t be);
+/**
+ * Reads a 16-bit value from a memory object at a given address.
+ * The value is read in either big-endian (BE) or little-endian (LE) format,
+ * depending on the `be` flag.
+ *
+ * @param mem The memory object to read from.
+ * @param address The address to read from.
+ * @param value Pointer to a 16-bit integer where the read value will be stored.
+ * @param be Flag indicating whether to read in big-endian format.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
+int memory_read_half(memory mem, uint32_t address, uint16_t *value, uint8_t be);
 
-/*
-Read a word to mem at a given address using a given endianness
-Data: - mem: the memory to be read from
-	  - address: the address to be read from
-	  - value: the value to be set
-	  - be: the endianess to be used
-*/
-int memory_read_word(memory mem, uint32_t address, uint32_t * value, uint8_t be);
+/**
+ * Reads a 32-bit value from a memory object at a given address.
+ * The value is read in either big-endian (BE) or little-endian (LE) format,
+ * depending on the `be` flag.
+ *
+ * @param mem The memory object to read from.
+ * @param address The address to read from.
+ * @param value Pointer to a 32-bit integer where the read value will be stored.
+ * @param be Flag indicating whether to read in big-endian format.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
+int memory_read_word(memory mem, uint32_t address, uint32_t *value, uint8_t be);
 
-/*
-Write a byte to mem at a given address
-Data: - mem: the memory to be written to
-	  - address: the address to be written to
-	  - value: the value to be written
-*/
+/**
+ * Writes a byte to a memory object at a given address.
+ *
+ * @param mem The memory object to write to.
+ * @param address The address to write to.
+ * @param value The value to write.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
 int memory_write_byte(memory mem, uint32_t address, uint8_t value);
 
-/*
-Write a half word to mem at a given address using a given endianness
-Data: - mem: the memory to be written to
-	  - address: the address to be written to
-	  - value: the value to be written
-	  - be: the endianess to be used
-*/
+/**
+ * Writes a 16-bit value to a memory object at a given address.
+ * The value is written in either big-endian (BE) or little-endian (LE) format,
+ * depending on the `be` flag.
+ *
+ * @param mem The memory object to write to.
+ * @param address The address to write to.
+ * @param value The value to write.
+ * @param be Flag indicating whether to write in big-endian format.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
 int memory_write_half(memory mem, uint32_t address, uint16_t value, uint8_t be);
 
-/*
-Write a word to mem at a given address using a given endianness
-Data: - mem: the memory to be written to
-	  - address: the address to be written to
-	  - value: the value to be written
-	  - be: the endianess to be used
-*/
+/**
+ * Writes a 32-bit value to a memory object at a given address.
+ * The value is written in either big-endian (BE) or little-endian (LE) format,
+ * depending on the `be` flag.
+ *
+ * @param mem The memory object to write to.
+ * @param address The address to write to.
+ * @param value The value to write.
+ * @param be Flag indicating whether to write in big-endian format.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
 int memory_write_word(memory mem, uint32_t address, uint32_t value, uint8_t be);
 
 #endif
