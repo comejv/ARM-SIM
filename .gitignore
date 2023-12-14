@@ -29,12 +29,12 @@
 *.dylib
 
 # Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+arm_simulator
+memory_test
+registers_test
+send_irq
+example*
+insertion_sort
 
 # Debug files
 *.dSYM/
@@ -61,3 +61,6 @@ stamp-h1
 *~
 autom4te.cache/
 config.*
+
+# Editor files
+.vscode/
