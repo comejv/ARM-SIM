@@ -14,7 +14,30 @@ Detailed installation instructions will be added once the development process re
 
 ## Usage
 
-Instructions on how to use the simulator will be provided, including how to interact with the simulator via `arm-none-eabi-gdb`, execute instructions step-by-step, and inspect the state of the simulated machine.
+The main program, arm_simulator acts as a gdb server, so a typical use session
+would look like:
+`./arm_simulator`
+this starts the simulator which waits for two kinds of incoming connections:
+- a connection from a gdb client
+- a connection from the external command used to send irqs to the simulator
+the simulator prints on the screen the ports numbers on which it listens for
+these connections.
+
+To use the simulator, you must connect to it a gdb client:
+```bash
+arm-none-eabi-gdb
+file Examples/foo (for instance)
+target remote localhost:<port number given by the simulator>
+load
+step
+break 8
+cont
+```
+... and so on
+
+Debugging messages and traces outputed by the simulator can be chosen at
+compile-time using compilation flags. Just comment the undesired flags settings
+in the first lines of Makefile.am, then make clean && make.
 
 ## Testing
 
