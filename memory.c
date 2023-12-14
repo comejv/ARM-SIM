@@ -32,7 +32,7 @@ struct memory_data
 
 memory memory_create(size_t size)
 {
-    memory mem = (memory *)malloc(sizeof(struct memory_data));
+    memory mem = (memory)malloc(sizeof(struct memory_data));
     if (mem == NULL)
     {
         return NULL;
@@ -97,7 +97,7 @@ int memory_read_half(memory mem, uint32_t address, uint16_t *value, uint8_t be)
     }
     else
     {
-        *value = (uint16_t)mem->data[address];
+        *value = (mem->data[address + 1] << 8) | mem->data[address];
     }
     return 0;
 }
@@ -115,7 +115,7 @@ int memory_read_word(memory mem, uint32_t address, uint32_t *value, uint8_t be)
     }
     else
     {
-        *value = (uint32_t)mem->data[address];
+        *value = mem->data[address + 3] << 24 | mem->data[address + 2] << 16 | mem->data[address + 1] << 8 | mem->data[address];
     }
     return 0;
 }
@@ -145,7 +145,8 @@ int memory_write_half(memory mem, uint32_t address, uint16_t value, uint8_t be)
     }
     else
     {
-        *(uint16_t *)(mem->data)[address] = value;
+        mem->data[address + 1] = (uint8_t)(value >> 8);
+        mem->data[address] = (uint8_t)value;
     }
     return 0;
 }
@@ -166,7 +167,10 @@ int memory_write_word(memory mem, uint32_t address, uint32_t value, uint8_t be)
     }
     else
     {
-        *(uint32_t *)(mem->data)[address] = value;
+        mem->data[address + 3] = (uint8_t)(value >> 24);
+        mem->data[address + 2] = (uint8_t)(value >> 16);
+        mem->data[address + 1] = (uint8_t)(value >> 8);
+        mem->data[address] = (uint8_t)value;
     }
     return 0;
 }
