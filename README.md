@@ -10,7 +10,7 @@ The simulator (server) and `arm-none-eabi-gdb` (client) interact via a TCP/IP ne
 
 ## Installation
 
-Detailed installation instructions will be added once the development process reaches a stable point.
+To install the project first download the repository, then in the project directory run `./configure CFLAGS=’-Wall -Werror -g’` and `make`. You should obtain an executable file `./arm_simulator`.
 
 ## Usage
 
