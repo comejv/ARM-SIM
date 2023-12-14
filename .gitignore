@@ -50,3 +50,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Vim swap
+*.swp
+
+# Log files
+*.log
+
