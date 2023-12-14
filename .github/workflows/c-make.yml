@@ -18,3 +18,16 @@ jobs:
       run: ./configure CFLAGS='-Wall -Werror -g'
     - name: make
       run: make
+
+  memory_test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run memory test and check return code
+      run: |
+        ./memory_test
+        if [ $? -ne 0 ]; then
+          echo "Memory test failed!"
+          exit 1
+        fi
