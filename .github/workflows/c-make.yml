@@ -15,6 +15,6 @@ jobs:
       with:
         release: '13.2.Rel1'
     - name: configure
-      run: ./configure CFLAGS=’-Wall -Werror -g’
+      run: ./configure CFLAGS='-Wall -Werror -g'
     - name: make
       run: make
