@@ -21,7 +21,7 @@ jobs:
       run: make
 
   memory_test:
-    - name: Memory test
+    name: Memory test
     needs: build
     runs-on: ubuntu-latest
     steps:
