@@ -55,6 +55,7 @@ dkms.conf
 *.swp
 
 # Automake files
+Makefile.in
 Makefile*
 .deps/
 stamp-h1
