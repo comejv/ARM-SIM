@@ -55,20 +55,19 @@ int main() {
     printf("Reseting registers...\n");
     registers_write_cpsr(r, 0x1d3);
     uint8_t mode = registers_get_mode(r);
-    registers_write(r, 7, mode, word_value[0]);
-    printf("PC value: %d %d\n",*(r->reg[7].data[mode]), word_value[0]);
     printf("Testing read and write to general registers:\n");
     for (i = 0; i < 15; i++) {
         registers_write(r, i, mode, word_value[i]);
     }
     for (i = 0; i < 15; i++) {
-        word_read = registers_read(r, mode, i);
-        printf("- register %d : ", i);
+        word_read = registers_read(r, i, mode);
+        printf("- register %d : must have : %d and have %d (read %d in mode  %d) ", i, word_value[i], *(r->reg[i].ptrs[mode]), word_read, mode);
         print_test(word_read == word_value[i]);
     }
 
     printf("Current mode : ");
-    print_test(registers_get_mode(r) == SVC);
+    print_test(registers_get_mode(r) == 0);
+    r->mode = 2;
     printf("Mode is priviledged : ");
     print_test(registers_in_a_privileged_mode(r));
     printf("Mode has spsr : ");

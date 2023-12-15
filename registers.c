@@ -26,14 +26,14 @@ Contact: Guillaume.Huard@imag.fr
 
 registers registers_create()
 {
+
     registers r = NULL;
     r = (registers)malloc(sizeof(struct registers_data));
     r->mode = USR;
     r->reg = (register_data *)malloc(sizeof(register_data) * N_REGISTRES);
     for (int i = 0; i < N_REGISTRES; i++)
     {
-        r->reg[i].data = (uint32_t **)malloc(sizeof(uint32_t *) * N_MODES);
-        uint32_t v_USER, v_SUPERVISOR, v_ABORT, v_UNDEFINED, v_INTERRUPT, v_FAST_INTERRUPT; 
+        r->reg[i].ptrs = (uint32_t **)malloc(sizeof(uint32_t *) * N_MODES);
         switch (i)
         {
         case 8:
@@ -41,35 +41,37 @@ registers registers_create()
         case 10:
         case 11:
         case 12: // There reg has the same value for mode 0 (USR) and mode 1 (FIQ)
+            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 2);
             for (int j = 0; j < N_MODES - 1; j++)
             {
-                r->reg[i].data[j] = &v_USER;
+                r->reg[i].ptrs[j] = &r->reg[i].data[0];
             }
-            r->reg[i].data[6] = &v_FAST_INTERRUPT;
+            r->reg[i].ptrs[6] = &r->reg[i].data[1];
             break;
         case 13:
         case 14:
-            r->reg[i].data[0] = &v_USER;
-            r->reg[i].data[1] = &v_USER;
-            r->reg[i].data[2] = &v_SUPERVISOR;
-            r->reg[i].data[3] = &v_ABORT;
-            r->reg[i].data[4] = &v_UNDEFINED;
-            r->reg[i].data[5] = &v_INTERRUPT;
-            r->reg[i].data[6] = &v_FAST_INTERRUPT;
+            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 6);
+            for (int j = 2; j < N_MODES; j++)
+            {
+                r->reg[i].ptrs[j] = &r->reg[i].data[j];
+            }
+            r->reg[i].ptrs[0] = &r->reg[i].data[0];
+            r->reg[i].ptrs[1] = &r->reg[i].data[0];
             break;
         case 17:
-            r->reg[i].data[0] = NULL;
-            r->reg[i].data[1] = NULL;
-            r->reg[i].data[2] = &v_SUPERVISOR;
-            r->reg[i].data[3] = &v_ABORT;
-            r->reg[i].data[4] = &v_UNDEFINED;
-            r->reg[i].data[5] = &v_INTERRUPT;
-            r->reg[i].data[6] = &v_FAST_INTERRUPT;
+            r->reg[i].ptrs[0] = NULL;
+            r->reg[i].ptrs[1] = NULL;
+            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 5);
+            for (int j = 2; j < N_MODES; j++)
+            {
+                r->reg[i].ptrs[j] = &r->reg[i].data[j];
+            }
             break;
         default:
+            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 1);
             for (int j = 0; j < N_MODES; j++)
             {
-                r->reg[i].data[j] = &v_USER;
+                r->reg[i].ptrs[j] = &r->reg[i].data[0];
             }
             break;
         }
@@ -84,6 +86,7 @@ void registers_destroy(registers r)
         for (int i = 0; i < N_REGISTRES; i++)
         {
             free(r->reg[i].data);
+            free(r->reg[i].ptrs);
         }
         free(r->reg);
     }
@@ -140,28 +143,28 @@ int registers_in_a_privileged_mode(registers r)
 
 uint32_t registers_read(registers r, uint8_t reg, uint8_t mode)
 {
-    return *(r->reg[reg].data[mode]);
+    return *(r->reg[reg].ptrs[mode]);
 }
 
 uint32_t registers_read_cpsr(registers r)
 {
-    return *(r->reg[CPSR].data[0]);
+    return *(r->reg[CPSR].ptrs[0]);
 }
 
 uint32_t registers_read_spsr(registers r, uint8_t mode)
 {
-    return *(r->reg[SCPSR].data[mode]);
+    return *(r->reg[SCPSR].ptrs[mode]);
 }
 
 void registers_write(registers r, uint8_t reg, uint8_t mode, uint32_t value)
 {
-    *r->reg[reg].data[mode] = value;
+    *(r->reg[reg].ptrs[mode]) = value;
     return;
 }
 
 void registers_write_cpsr(registers r, uint32_t value)
 {
-    *r->reg[CPSR].data[0] = value;
+    *(r->reg[CPSR].ptrs[0]) = value;
     return;
 }
 
@@ -169,7 +172,7 @@ void registers_write_spsr(registers r, uint8_t mode, uint32_t value)
 {
     if (registers_mode_has_spsr(r, mode))
     {
-        *r->reg[SCPSR].data[mode] = value;
+        *(r->reg[SCPSR].ptrs[mode]) = value;
     }
     return;
 }

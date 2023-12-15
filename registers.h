@@ -35,7 +35,8 @@ Contact: Guillaume.Huard@imag.fr
 
 typedef struct
 {
-    uint32_t **data;
+    uint32_t *data;
+    uint32_t **ptrs;
 } register_data;
 
 // R0 - R14 = reg[0] - reg[14];
