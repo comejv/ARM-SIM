@@ -55,12 +55,14 @@ dkms.conf
 *.swp
 
 # Automake files
-Makefile*
+**/Makefile
+**/Makefile.in
 .deps/
 stamp-h1
 *~
 autom4te.cache/
 config.*
+*.m4
 
 # Editor files
 .vscode/
