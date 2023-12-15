@@ -65,7 +65,8 @@ void memory_destroy(memory mem);
  */
 
 /**
- * @brief Reads a byte from a memory object at a given address. No side effects.
+ * @brief Reads a byte from a memory object at a given address. A NULL address
+ * read the mem[0] byte. No side effects.
  *
  * @param mem The memory object to read from.
  * @param address The address to read from.
@@ -77,7 +78,7 @@ int memory_read_byte(memory mem, uint32_t address, uint8_t *value);
 /**
  * @brief Reads a 16-bit value from a memory object at a given address.
  * The value is read in either big-endian (BE) or little-endian (LE) format,
- * depending on the `be` flag. No side effects.
+ * depending on the `be` flag. A NULL address read the mem[0] byte. No side effects.
  *
  * @param mem The memory object to read from.
  * @param address The address to read from.
@@ -90,7 +91,7 @@ int memory_read_half(memory mem, uint32_t address, uint16_t *value, uint8_t be);
 /**
  * @brief Reads a 32-bit value from a memory object at a given address.
  * The value is read in either big-endian (BE) or little-endian (LE) format,
- * depending on the `be` flag. No side effects.
+ * depending on the `be` flag. A NULL address read the mem[0] byte. sNo side effects.
  *
  * @param mem The memory object to read from.
  * @param address The address to read from.
@@ -101,8 +102,8 @@ int memory_read_half(memory mem, uint32_t address, uint16_t *value, uint8_t be);
 int memory_read_word(memory mem, uint32_t address, uint32_t *value, uint8_t be);
 
 /**
- * @brief Writes a byte to a memory object at a given address. 
- * Modificates the memory at a specified address.
+ * @brief Writes a byte to a memory object at a given address. A NULL address 
+ * write the mem[0] byte. Modificates the memory at a specified address.
  *
  * @param mem The memory object to write to.
  * @param address The address to write to.
@@ -114,7 +115,8 @@ int memory_write_byte(memory mem, uint32_t address, uint8_t value);
 /**
  * @brief Writes a 16-bit value to a memory object at a given address.
  * The value is written in either big-endian (BE) or little-endian (LE) format,
- * depending on the `be` flag. Modificates the memory at a specified address.
+ * depending on the `be` flag. A NULL address write the mem[0] byte. Modificates
+ * the memory at a specified address.
  *
  * @param mem The memory object to write to.
  * @param address The address to write to.
@@ -127,7 +129,8 @@ int memory_write_half(memory mem, uint32_t address, uint16_t value, uint8_t be);
 /**
  * @brief Writes a 32-bit value to a memory object at a given address.
  * The value is written in either big-endian (BE) or little-endian (LE) format,
- * depending on the `be` flag. Modificates the memory at a specified address.
+ * depending on the `be` flag. A NULL address write the mem[0] byte. Modificates
+ * the memory at a specified address.
  *
  * @param mem The memory object to write to.
  * @param address The address to write to.
