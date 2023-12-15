@@ -15,7 +15,7 @@ jobs:
       - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
         uses: carlosperate/arm-none-eabi-gcc-action@v1
       - name: configure project
-        run: ./configure CFLAGS='-Wall -Werror -g'
+        run: autoreconf && ./configure CFLAGS='-Wall -Werror -g'
       - name: make project
         run: make
       - name: Archive memory_test artifacts
