@@ -1,47 +1,138 @@
 /*
-Armator - simulateur de jeu d'instruction ARMv5T à but pédagogique
+Armator - simulateur de jeu d'instruction ARMv5T ï¿½ but pï¿½dagogique
 Copyright (C) 2011 Guillaume Huard
 Ce programme est libre, vous pouvez le redistribuer et/ou le modifier selon les
-termes de la Licence Publique Générale GNU publiée par la Free Software
-Foundation (version 2 ou bien toute autre version ultérieure choisie par vous).
+termes de la Licence Publique Gï¿½nï¿½rale GNU publiï¿½e par la Free Software
+Foundation (version 2 ou bien toute autre version ultï¿½rieure choisie par vous).
 
-Ce programme est distribué car potentiellement utile, mais SANS AUCUNE
+Ce programme est distribuï¿½ car potentiellement utile, mais SANS AUCUNE
 GARANTIE, ni explicite ni implicite, y compris les garanties de
-commercialisation ou d'adaptation dans un but spécifique. Reportez-vous à la
-Licence Publique Générale GNU pour plus de détails.
+commercialisation ou d'adaptation dans un but spï¿½cifique. Reportez-vous ï¿½ la
+Licence Publique Gï¿½nï¿½rale GNU pour plus de dï¿½tails.
 
-Vous devez avoir reçu une copie de la Licence Publique Générale GNU en même
-temps que ce programme ; si ce n'est pas le cas, écrivez à la Free Software
+Vous devez avoir reï¿½u une copie de la Licence Publique Gï¿½nï¿½rale GNU en mï¿½me
+temps que ce programme ; si ce n'est pas le cas, ï¿½crivez ï¿½ la Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,
-États-Unis.
+ï¿½tats-Unis.
 
 Contact: Guillaume.Huard@imag.fr
-	 Bâtiment IMAG
+	 Bï¿½timent IMAG
 	 700 avenue centrale, domaine universitaire
-	 38401 Saint Martin d'Hères
+	 38401 Saint Martin d'Hï¿½res
 */
 #ifndef __MEMORY_H__
 #define __MEMORY_H__
 #include <stdint.h>
 #include <sys/types.h>
 
+/**
+ * A memory object.
+ * It contains a size and a pointer to the data.
+ * The data is stored as an array of bytes.
+ */
 typedef struct memory_data *memory;
 
+/**
+ * Creates a memory object of a given size.
+ *
+ * @param size The size of the memory object to create.
+ * @return The created memory object.
+ */
 memory memory_create(size_t size);
+
+/**
+ * Returns the size of a memory object.
+ *
+ * @param mem The memory object to get the size of.
+ * @return The size of the memory object.
+ */
 size_t memory_get_size(memory mem);
+
+/**
+ * Destroys a memory object.
+ *
+ * @param mem The memory object to destroy.
+ * @return void
+ */
 void memory_destroy(memory mem);
 
-/* All these functions perform a read/write access to a byte/half/word data at
+/* All the following functions perform a read/write access to a byte/half/word data at
  * address a in mem. The result is respectively taken from or stored to the
- * parameter value. The access is made using the given endianess (be == 1 for a
+ * parameter value. The access is made using the given endianness (be == 1 for a
  * big endian access and be == 0 for a little endian access).
  * The return value indicates a succes (0) or a failure (-1).
  */
-int memory_read_byte(memory mem, uint32_t address, uint8_t * value);
-int memory_read_half(memory mem, uint32_t address, uint16_t * value, uint8_t be);
-int memory_read_word(memory mem, uint32_t address, uint32_t * value, uint8_t be);
+
+/**
+ * Reads a byte from a memory object at a given address.
+ *
+ * @param mem The memory object to read from.
+ * @param address The address to read from.
+ * @param value Pointer to a byte where the read value will be stored.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
+int memory_read_byte(memory mem, uint32_t address, uint8_t *value);
+
+/**
+ * Reads a 16-bit value from a memory object at a given address.
+ * The value is read in either big-endian (BE) or little-endian (LE) format,
+ * depending on the `be` flag.
+ *
+ * @param mem The memory object to read from.
+ * @param address The address to read from.
+ * @param value Pointer to a 16-bit integer where the read value will be stored.
+ * @param be Flag indicating whether to read in big-endian format.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
+int memory_read_half(memory mem, uint32_t address, uint16_t *value, uint8_t be);
+
+/**
+ * Reads a 32-bit value from a memory object at a given address.
+ * The value is read in either big-endian (BE) or little-endian (LE) format,
+ * depending on the `be` flag.
+ *
+ * @param mem The memory object to read from.
+ * @param address The address to read from.
+ * @param value Pointer to a 32-bit integer where the read value will be stored.
+ * @param be Flag indicating whether to read in big-endian format.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
+int memory_read_word(memory mem, uint32_t address, uint32_t *value, uint8_t be);
+
+/**
+ * Writes a byte to a memory object at a given address.
+ *
+ * @param mem The memory object to write to.
+ * @param address The address to write to.
+ * @param value The value to write.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
 int memory_write_byte(memory mem, uint32_t address, uint8_t value);
+
+/**
+ * Writes a 16-bit value to a memory object at a given address.
+ * The value is written in either big-endian (BE) or little-endian (LE) format,
+ * depending on the `be` flag.
+ *
+ * @param mem The memory object to write to.
+ * @param address The address to write to.
+ * @param value The value to write.
+ * @param be Flag indicating whether to write in big-endian format.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
 int memory_write_half(memory mem, uint32_t address, uint16_t value, uint8_t be);
+
+/**
+ * Writes a 32-bit value to a memory object at a given address.
+ * The value is written in either big-endian (BE) or little-endian (LE) format,
+ * depending on the `be` flag.
+ *
+ * @param mem The memory object to write to.
+ * @param address The address to write to.
+ * @param value The value to write.
+ * @param be Flag indicating whether to write in big-endian format.
+ * @return 0 if successful, -1 if the memory object is NULL or the address is out of bounds.
+ */
 int memory_write_word(memory mem, uint32_t address, uint32_t value, uint8_t be);
 
 #endif
