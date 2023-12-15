@@ -39,7 +39,7 @@ jobs:
       - name: Download memory check
         uses: actions/download-artifact@v2
         with:
-          name: memory-check
+          name: memory-test
       - name: Run memory test and check return code
         run: |
           ./memory_check
@@ -58,7 +58,7 @@ jobs:
       - name: Download registers check
         uses: actions/download-artifact@v2
         with:
-          name: registers-check
+          name: registers-test
       - name: Run registers test and check return code
         run: |
           ./registers_check
