@@ -2,37 +2,67 @@ name: Configure and make
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
   build:
-
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
-      uses: carlosperate/arm-none-eabi-gcc-action@v1
-      with:
-        release: '13.2.Rel1'
-    - name: configure
-      run: ./configure CFLAGS='-Wall -Werror -g'
-    - name: make
-      run: make
+      - uses: actions/checkout@v3
+      - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
+        uses: carlosperate/arm-none-eabi-gcc-action@v1
+      - name: configure project
+        run: ./configure CFLAGS='-Wall -Werror -g'
+      - name: make project
+        run: make
+      - name: Archive memory_test artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: memory-test
+          path: ./memory_test
+      - name: Archive registers_test artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: registers-test
+          path: ./registers_test
 
   memory_test:
     name: Memory test
     needs: build
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Run memory test and check return code
-      run: |
-        ./memory_test
-        if [ $? -ne 0 ]; then
-          echo "Memory test failed!"
-          exit 1
-        fi
 
-    
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download memory check
+        uses: actions/download-artifact@v2
+        with:
+          name: memory-test
+      - name: Run memory test and check return code
+        run: |
+          ./memory_check
+          if [ $? -ne 0 ]; then
+            echo "Memory test failed!"
+            exit 1
+          fi
+
+  registers_test:
+    name: Registers test
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download registers check
+        uses: actions/download-artifact@v2
+        with:
+          name: registers-test
+      - name: Run registers test and check return code
+        run: |
+          ./registers_check
+          if [ $? -ne 0 ]; then
+            echo "Registers test failed!"
+            exit 1
+          fi
