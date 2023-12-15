@@ -28,13 +28,6 @@ Contact: Guillaume.Huard@imag.fr
 #include "arm_constants.h"
 #include "util.h"
 
-void print_test(int result) {
-    if (result)
-        printf("Test succeded\n");
-    else
-        printf("TEST FAILED !!\n");
-}
-
 int main() {
     registers r;
     uint32_t word_value[15], word_read;
@@ -61,18 +54,32 @@ int main() {
     }
     for (i = 0; i < 15; i++) {
         word_read = registers_read(r, i, mode);
-        printf("- register %d : must have : %d and have %d (read %d in mode  %d) ", i, word_value[i], *(r->reg[i].ptrs[mode]), word_read, mode);
-        print_test(word_read == word_value[i]);
+        printf("- register %d : must have : %d and have %d (in mode  %d) ", i, word_value[i], word_read, mode);
+        if (word_read != word_value[i]) return 1;
+        printf("Test passed\n");
     }
 
     printf("Current mode : ");
-    print_test(registers_get_mode(r) == 0);
-    r->mode = 2;
+    if (registers_get_mode(r) != USR) return 1;
+    printf("Test passed\n");
+    r->mode = IRQ;
     printf("Mode is priviledged : ");
-    print_test(registers_in_a_privileged_mode(r));
+    if (!registers_in_a_privileged_mode(r)) return 1;
+    printf("Test passed\n");
     printf("Mode has spsr : ");
-    print_test(registers_current_mode_has_spsr(r));
+    if (!registers_current_mode_has_spsr(r)) return 1;
+    printf("Test passed\n");
 
+    printf("Test if pointer have the same destination : ");
+    if (registers_read(r, 0, USR) != registers_read(r, 0, IRQ)) return 1;
+    printf("Test passed\n");
+    printf("Test if pointer have differents destination : ");
+    registers_write(r, 14, USR, 0x10);
+    registers_write(r, 14, IRQ, 0x5);
+    if (registers_read(r, 14, USR) == registers_read(r, 14, IRQ)) return 1;
+    printf("Test passed\n");
+
+    printf("Free registers...\n");
     registers_destroy(r);
 
     return 0;

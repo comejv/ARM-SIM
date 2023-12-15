@@ -79,6 +79,7 @@ registers registers_create()
     return r;
 }
 
+
 void registers_destroy(registers r)
 {
     if (r != NULL)
@@ -94,10 +95,9 @@ void registers_destroy(registers r)
     return;
 }
 
-uint8_t registers_get_mode(registers r)
-{
+uint8_t get_read_write_mode(uint8_t mode){
     uint8_t m;
-    switch (r->mode)
+    switch (mode)
     {
     case USR:
         m = 0;
@@ -126,9 +126,14 @@ uint8_t registers_get_mode(registers r)
     return m;
 }
 
+uint8_t registers_get_mode(registers r)
+{
+    return r->mode;
+}
+
 static int registers_mode_has_spsr(registers r, uint8_t mode)
 {
-    return mode >= 2;
+    return get_read_write_mode(mode) >= 2;
 }
 
 int registers_current_mode_has_spsr(registers r)
@@ -138,12 +143,13 @@ int registers_current_mode_has_spsr(registers r)
 
 int registers_in_a_privileged_mode(registers r)
 {
-    return r->mode != USR;
+    return registers_get_mode(r) != USR;
 }
 
 uint32_t registers_read(registers r, uint8_t reg, uint8_t mode)
 {
-    return *(r->reg[reg].ptrs[mode]);
+    uint8_t m = get_read_write_mode(mode);
+    return *(r->reg[reg].ptrs[m]);
 }
 
 uint32_t registers_read_cpsr(registers r)
@@ -153,12 +159,14 @@ uint32_t registers_read_cpsr(registers r)
 
 uint32_t registers_read_spsr(registers r, uint8_t mode)
 {
-    return *(r->reg[SCPSR].ptrs[mode]);
+    uint8_t m = get_read_write_mode(mode);
+    return *(r->reg[SCPSR].ptrs[m]);
 }
 
 void registers_write(registers r, uint8_t reg, uint8_t mode, uint32_t value)
 {
-    *(r->reg[reg].ptrs[mode]) = value;
+    uint8_t m = get_read_write_mode(mode);
+    *(r->reg[reg].ptrs[m]) = value;
     return;
 }
 
@@ -172,7 +180,8 @@ void registers_write_spsr(registers r, uint8_t mode, uint32_t value)
 {
     if (registers_mode_has_spsr(r, mode))
     {
-        *(r->reg[SCPSR].ptrs[mode]) = value;
+        uint8_t m = get_read_write_mode(mode);
+        *(r->reg[SCPSR].ptrs[m]) = value;
     }
     return;
 }
