@@ -3,6 +3,7 @@ name: Configure and make
 on:
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,6 +22,7 @@ jobs:
       run: make
 
   memory_test:
+    name: Memory test
     needs: build
     runs-on: ubuntu-latest
     steps:
