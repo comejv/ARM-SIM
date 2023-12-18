@@ -33,6 +33,25 @@ Contact: Guillaume.Huard@imag.fr
 #define UND 0x1b
 #define SYS 0x1f
 
+/* ARM Registers Name */
+#define R0 0
+#define R1 1
+#define R2 2
+#define R3 3
+#define R4 4
+#define R5 5
+#define R6 6
+#define R7 7
+#define R8 8
+#define R9 9
+#define R10 10
+#define R11 11
+#define R12 12
+#define R13 13
+#define LR 14
+#define PC 15
+
+
 /* ARM Exceptions (by priority) */
 #define RESET 1
 #define DATA_ABORT 2
@@ -76,38 +95,6 @@ Contact: Guillaume.Huard@imag.fr
 #define GT 0xC
 #define LE 0xD
 #define AL 0xE
-
-/* Bit mask constants for msr */
-/* We simulate architecture v5T */
-#define UnallocMask 0x0FFFFF00
-#define UserMask 0xF0000000
-#define PrivMask 0x0000000F
-#define StateMask 0x00000020
-
-/* Fetch masks constants */
-#define CONDITION_MASK 0xF0000000
-#define INSTRUCTION_MASK 0x0E000000
-#define OPCODE_MASK 0x01E00000
-#define B24_MASK 0x01000000 
-#define P_MASK 0x01000000
-#define U_MASK 0x00800000
-#define B_MASK 0x00400000
-#define W_MASK 0x00200000
-#define L_MASK 0x00100000
-#define S_MASK 0x00001000 
-#define B4_MASK 0x00000010
-
-#define B4_SHIFT 4
-#define S_SHIFT 20
-#define L_SHIFT 20
-#define W_SHIFT 21
-#define B_SHIFT 22
-#define U_MASK 23
-#define P_SHIFT 24
-#define B24_SHIFT 24
-#define OPCODE_SHIFT 21
-#define INSTRUCTION_SHIFT 25
-#define CONDITION_SHIFT 28
 
 char *arm_get_exception_name(unsigned char exception);
 char *arm_get_mode_name(uint8_t mode);
