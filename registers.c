@@ -42,7 +42,7 @@ registers registers_create()
         case 10:
         case 11:
         case 12: // There reg has the same value for mode 0 (USR) and mode 1 (FIQ)
-            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 2);
+            r->reg[i].data = (uint32_t *)calloc(2, sizeof(uint32_t) );
             for (int j = 0; j < N_MODES - 1; j++)
             {
                 r->reg[i].ptrs[j] = &r->reg[i].data[0];
@@ -51,7 +51,7 @@ registers registers_create()
             break;
         case 13:
         case 14:
-            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 6);
+            r->reg[i].data = (uint32_t *)calloc(6, sizeof(uint32_t) );
             for (int j = 2; j < N_MODES; j++)
             {
                 r->reg[i].ptrs[j] = &r->reg[i].data[j];
@@ -62,14 +62,14 @@ registers registers_create()
         case 17:
             r->reg[i].ptrs[0] = NULL;
             r->reg[i].ptrs[1] = NULL;
-            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 5);
+            r->reg[i].data = (uint32_t *)calloc(5, sizeof(uint32_t));
             for (int j = 2; j < N_MODES; j++)
             {
                 r->reg[i].ptrs[j] = &r->reg[i].data[j];
             }
             break;
         default:
-            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 1);
+            r->reg[i].data = (uint32_t *)calloc(1, sizeof(uint32_t));
             for (int j = 0; j < N_MODES; j++)
             {
                 r->reg[i].ptrs[j] = &r->reg[i].data[0];
