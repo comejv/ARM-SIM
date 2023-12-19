@@ -34,6 +34,7 @@ memory_test
 registers_test
 send_irq
 example*
+**/*test
 insertion_sort
 
 # Debug files
