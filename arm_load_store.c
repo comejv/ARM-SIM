@@ -160,9 +160,134 @@ int arm_load_store_immediate_offset(arm_core p, uint32_t ins) {
     return UNDEFINED_INSTRUCTION;
 }
 
-int arm_load_store_register_offset(arm_core p, uint32_t ins)
+int arm_load_store_miscellaneous_register_offset(arm_core p, uint32_t ins)
 {
-    return UNDEFINED_INSTRUCTION;
+    // Get parameters
+    uint8_t p_bit = get_bit(ins, P_SHIFT);
+    uint8_t u_bit = get_bit(ins, U_SHIFT);
+    uint8_t w_bit = get_bit(ins, W_SHIFT);
+    uint8_t  b_bits = get_bit(ins, B_SHIFT);
+    uint8_t lsh_bits = get_bit(ins, L_SHIFT) << 2 | get_bit(ins, 6) << 1 | get_bit(ins, 5);
+
+    uint8_t rn = get_bits(ins, RN_SHIFT + 3, RN_SHIFT);
+    uint8_t rd = get_bits(ins, RD_SHIFT + 3, RN_SHIFT);
+
+    uint8_t op1 = get_bits(ins, 8 + 3, 8);
+    uint8_t op0 = get_bits(ins, 0 + 3, 0);
+
+    uint32_t address = 0;
+    uint8_t offset = 0;
+
+    uint32_t val = 0;
+    int err = 0;
+
+    // Check instruction type
+    if (p_bit && b_bits && !w_bit) // Immediate offset
+    {
+        offset = op1 << 4 | op0;
+        if (u_bit)
+        {
+            address = arm_read_register(p, rn) + offset;
+        }
+        else
+        {
+            address = arm_read_register(p, rn) - offset;
+        }
+    }
+    else if (p_bit && !b_bits && !w_bit) // Register offset
+    {
+        if (u_bit)
+        {
+            address = arm_read_register(p, rn) + arm_read_register(p, op0);
+        }
+        else
+        {
+            address = arm_read_register(p, rn) - arm_read_register(p, op0);
+        }
+    }
+    else if (p_bit && b_bits && w_bit) // Immediate pre indexed
+    {
+        offset = op1 << 4 | op0;
+        if (u_bit)
+        {
+            address = arm_read_register(p, rn) + offset;
+        }
+        else
+        {
+            address = arm_read_register(p, rn) - offset;
+        }
+    }
+    else if (p_bit && !b_bits && w_bit) // Register pre indexed
+    {
+        if (u_bit)
+        {
+            address = arm_read_register(p, rn) + arm_read_register(p, op0);
+        }
+        else
+        {
+            address = arm_read_register(p, rn) - arm_read_register(p, op0);
+        }
+        arm_write_register(p, rn, address);
+    }
+    else if (!p_bit && b_bits && !w_bit) // Immediate post indexed
+    {
+        address = arm_read_register(p, rn);
+        offset = op1 << 4 | op0;
+        if (u_bit)
+        {
+            arm_write_register(p, rn, arm_read_register(p, rn) + offset);
+        }
+        else
+        {
+            arm_write_register(p, rn, arm_read_register(p, rn) - offset);
+        }
+    }
+    else if (!p_bit && !b_bits && !w_bit) // Register post indexed
+    {
+        address = arm_read_register(p, rn);
+        if (u_bit)
+        {
+            arm_write_register(p, rn, arm_read_register(p, rn) + arm_read_register(p, op0));
+        }
+        else
+        {
+            arm_write_register(p, rn, arm_read_register(p, rn) - arm_read_register(p, op0));
+        }
+    }
+    else
+    {
+        return UNDEFINED_INSTRUCTION;
+    }
+
+    switch (lsh_bits) // NB: If lsh_bits == 5 or lsh_bits == 0 then addressing mode 2
+    {
+        case 1: // Store half word, L = 0, S = 0, H = 1
+            arm_read_register(p, rd);
+            err = arm_write_half(p, address, (uint16_t) val);
+            break;
+        case 2: // Load double word, L = 0, S = 1, H = 0
+            err = UNDEFINED_INSTRUCTION;
+            break;
+        case 3: // Store double word, L = 0, S = 1, H = 1
+            err = UNDEFINED_INSTRUCTION;
+            break;
+        case 5: // Load unsigned half word, L = 1, S = 0, H = 1
+            err = arm_read_half(p, address, (uint16_t *)&val);
+            arm_write_register(p, rd, val);
+            break;
+        case 6: // Load signed byte, L = 1, S = 1, H = 0
+            err = arm_read_byte(p, address, (uint8_t *)&val);
+            arm_write_register(p, rd, val);
+            break;
+        case 7: // Load signed half word, L = 1, S = 1, H = 1
+            err = arm_read_half(p, address, (uint16_t *)&val);
+            arm_write_register(p, rd, val);
+            break;
+        default:
+            err = UNDEFINED_INSTRUCTION;
+    }
+
+    return err;
 }
 
 int arm_load_store_multiple(arm_core p, uint32_t ins)
