@@ -78,7 +78,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
                 // Multiplies; Extra load/stores
                 if (b5 == 0 && b6 == 0)
                 {
-                    // Multiplies
+                    CODE_ERREUR = arm_multiply(p, inst);
                 }
                 else
                 {
@@ -220,6 +220,7 @@ static int arm_execute_instruction(arm_core p)
     }
     return 0;
 }
+
 
 int arm_step(arm_core p)
 {
