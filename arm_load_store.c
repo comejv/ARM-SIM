@@ -143,8 +143,13 @@ int arm_store_immediate_offset(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint
 
 int arm_store_immediate_preindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset)
 {
-    arm_store_immediate_offset(p, l, u, b, rd, addr, offset);
+    int err = arm_store_immediate_offset(p, l, u, b, rd, addr, offset);
+    if (err)
+    {
+        return err;
+    }
     arm_write_register(p, rn, *addr);
+    return err;
 }
 
 int arm_store_immediate_postindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset)
@@ -158,6 +163,7 @@ int arm_store_immediate_postindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b
     u_bit_handle(u, addr, offset);
 
     arm_write_register(p, rn, *addr);
+    return err;
 }
 
 int arm_load_store_immediate_offset(arm_core p, uint32_t ins)
@@ -238,27 +244,51 @@ int arm_load_store_immediate_offset(arm_core p, uint32_t ins)
 
 //     uint8_t register_n = get_bits(ins, 19, 16);
 //     uint8_t register_d = get_bits(ins, 15, 12);
+//     uint8_t shift_imm = get_bits(ins, 11, 7);
+//     uint8_t shift = get_bits(ins, 6, 5);
+//     uint8_t bit_4 = get_bit(ins, 4);
 //     uint8_t register_m = get_bits(ins, 3, 0);
 //     uint32_t offset = arm_read_register(p, register_m);
 //     uint32_t address_base = arm_read_register(p, register_n);
 
+//     uint8_t scaled = (uint8_t)shift_imm & (uint8_t)shift & (uint8_t)bit_4;
 //     int err;
+    
+//     if (scaled != 0) {
+
+//     }
 
 //     switch (lpw_bits) {
 //         case 0b000: // L 0 -> Store // P 0 -> Postindexing // Wdoit etre a 0
 //             err = arm_store_immediate_postindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
-//         case 0b001:
-
-//             err =        case 0b010:
-//         case 0b011:
-//         case 0b100:
+//             break;
+//         case 0b001: // W - 1
+//             err = UNDEFINED_INSTRUCTION;
+//             break;
+//         case 0b010: // P - 1 W - 0 => Register Offset
+//             err = arm_store_immediate_offset(p, l_bit, u_bit, b_bit, register_d, &address_base, offset);
+//             break;
+//         case 0b011: // P - 1 W - 1 => Register Pre-indexing
+//             err = arm_store_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+//             break;
+//         case 0b100: // L 1 -> Load // P 0 -> Post indexing
+//             err = arm_load_immediate_postindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+//             break;
 //         case 0b101:
+//             err = UNDEFINED_INSTRUCTION;
+//             break;
 //         case 0b110:
+//             err = arm_load_immediate_offset(p, l_bit, u_bit, b_bit, register_d, &address_base, offset);
+//             break;
 //         case 0b111:
+//             err = arm_load_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+//             break;
+//         default:
+//             // It should not exist
 //             break;
 //     }
 
-//     return UNDEFINED_INSTRUCTION;
+//     return err;
 // }
 
 int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
@@ -324,7 +354,7 @@ int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
         {
             address = arm_read_register(p, rn) + arm_read_register(p, op0);
         }
-        else // Come il est beau
+        else
         {
             address = arm_read_register(p, rn) - arm_read_register(p, op0);
         }
