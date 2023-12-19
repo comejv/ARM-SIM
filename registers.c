@@ -97,7 +97,7 @@ void registers_destroy(registers r)
 
 uint8_t get_read_write_mode(uint8_t mode)
 {
-    uint8_t m;
+    uint8_t m = 0;
     switch (mode)
     {
     case USR:
