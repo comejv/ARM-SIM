@@ -22,6 +22,7 @@ Contact: Guillaume.Huard@imag.fr
 */
 #include "registers.h"
 #include "arm_constants.h"
+#include "util.h"
 #include <stdlib.h>
 
 registers registers_create()
@@ -79,7 +80,6 @@ registers registers_create()
     return r;
 }
 
-
 void registers_destroy(registers r)
 {
     if (r != NULL)
@@ -95,7 +95,8 @@ void registers_destroy(registers r)
     return;
 }
 
-uint8_t get_read_write_mode(uint8_t mode){
+uint8_t get_read_write_mode(uint8_t mode)
+{
     uint8_t m;
     switch (mode)
     {
@@ -149,30 +150,38 @@ int registers_in_a_privileged_mode(registers r)
 uint32_t registers_read(registers r, uint8_t reg, uint8_t mode)
 {
     uint8_t m = get_read_write_mode(mode);
-    return *(r->reg[reg].ptrs[m]);
+    uint32_t x = *(r->reg[reg].ptrs[m]);
+    if (!is_big_endian())
+    {
+        switch_endian(&x);
+    }
+    return x;
 }
 
 uint32_t registers_read_cpsr(registers r)
 {
-    return *(r->reg[CPSR].ptrs[0]);
+    return registers_read(r, CPSR, r->mode);
 }
 
 uint32_t registers_read_spsr(registers r, uint8_t mode)
 {
-    uint8_t m = get_read_write_mode(mode);
-    return *(r->reg[SCPSR].ptrs[m]);
+    return registers_read(r, SPSR, mode);
 }
 
 void registers_write(registers r, uint8_t reg, uint8_t mode, uint32_t value)
 {
     uint8_t m = get_read_write_mode(mode);
+    if (!is_big_endian())
+    {
+        switch_endian(&value);
+    }
     *(r->reg[reg].ptrs[m]) = value;
     return;
 }
 
 void registers_write_cpsr(registers r, uint32_t value)
 {
-    *(r->reg[CPSR].ptrs[0]) = value;
+    registers_write(r, CPSR, 0, value);
     return;
 }
 
@@ -181,7 +190,7 @@ void registers_write_spsr(registers r, uint8_t mode, uint32_t value)
     if (registers_mode_has_spsr(r, mode))
     {
         uint8_t m = get_read_write_mode(mode);
-        *(r->reg[SCPSR].ptrs[m]) = value;
+        registers_write(r, SPSR, m, value);
     }
     return;
 }
