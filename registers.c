@@ -22,6 +22,7 @@ Contact: Guillaume.Huard@imag.fr
 */
 #include "registers.h"
 #include "arm_constants.h"
+#include "util.h"
 #include <stdlib.h>
 
 registers registers_create()
@@ -41,7 +42,7 @@ registers registers_create()
         case 10:
         case 11:
         case 12: // There reg has the same value for mode 0 (USR) and mode 1 (FIQ)
-            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 2);
+            r->reg[i].data = (uint32_t *)calloc(2, sizeof(uint32_t) );
             for (int j = 0; j < N_MODES - 1; j++)
             {
                 r->reg[i].ptrs[j] = &r->reg[i].data[0];
@@ -50,7 +51,7 @@ registers registers_create()
             break;
         case 13:
         case 14:
-            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 6);
+            r->reg[i].data = (uint32_t *)calloc(6, sizeof(uint32_t) );
             for (int j = 2; j < N_MODES; j++)
             {
                 r->reg[i].ptrs[j] = &r->reg[i].data[j];
@@ -61,14 +62,14 @@ registers registers_create()
         case 17:
             r->reg[i].ptrs[0] = NULL;
             r->reg[i].ptrs[1] = NULL;
-            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 5);
+            r->reg[i].data = (uint32_t *)calloc(5, sizeof(uint32_t));
             for (int j = 2; j < N_MODES; j++)
             {
                 r->reg[i].ptrs[j] = &r->reg[i].data[j];
             }
             break;
         default:
-            r->reg[i].data = (uint32_t *)malloc(sizeof(uint32_t) * 1);
+            r->reg[i].data = (uint32_t *)calloc(1, sizeof(uint32_t));
             for (int j = 0; j < N_MODES; j++)
             {
                 r->reg[i].ptrs[j] = &r->reg[i].data[0];
@@ -78,7 +79,6 @@ registers registers_create()
     }
     return r;
 }
-
 
 void registers_destroy(registers r)
 {
@@ -95,7 +95,8 @@ void registers_destroy(registers r)
     return;
 }
 
-uint8_t get_read_write_mode(uint8_t mode){
+uint8_t get_read_write_mode(uint8_t mode)
+{
     uint8_t m;
     switch (mode)
     {
@@ -149,30 +150,38 @@ int registers_in_a_privileged_mode(registers r)
 uint32_t registers_read(registers r, uint8_t reg, uint8_t mode)
 {
     uint8_t m = get_read_write_mode(mode);
-    return *(r->reg[reg].ptrs[m]);
+    uint32_t x = *(r->reg[reg].ptrs[m]);
+    if (!is_big_endian())
+    {
+        switch_endian(&x);
+    }
+    return x;
 }
 
 uint32_t registers_read_cpsr(registers r)
 {
-    return *(r->reg[CPSR].ptrs[0]);
+    return registers_read(r, CPSR, r->mode);
 }
 
 uint32_t registers_read_spsr(registers r, uint8_t mode)
 {
-    uint8_t m = get_read_write_mode(mode);
-    return *(r->reg[SCPSR].ptrs[m]);
+    return registers_read(r, SPSR, mode);
 }
 
 void registers_write(registers r, uint8_t reg, uint8_t mode, uint32_t value)
 {
     uint8_t m = get_read_write_mode(mode);
+    if (!is_big_endian())
+    {
+        switch_endian(&value);
+    }
     *(r->reg[reg].ptrs[m]) = value;
     return;
 }
 
 void registers_write_cpsr(registers r, uint32_t value)
 {
-    *(r->reg[CPSR].ptrs[0]) = value;
+    registers_write(r, CPSR, 0, value);
     return;
 }
 
@@ -181,7 +190,7 @@ void registers_write_spsr(registers r, uint8_t mode, uint32_t value)
     if (registers_mode_has_spsr(r, mode))
     {
         uint8_t m = get_read_write_mode(mode);
-        *(r->reg[SCPSR].ptrs[m]) = value;
+        registers_write(r, SPSR, m, value);
     }
     return;
 }
