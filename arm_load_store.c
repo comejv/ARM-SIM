@@ -40,83 +40,128 @@ Contact: Guillaume.Huard@imag.fr
 #define U_SHIFT 23
 #define P_SHIFT 24
 
-void u_bit_handle(uint8_t u, uint32_t *addr, uint32_t offset) {
-    if (u) {
+void u_bit_handle(uint8_t u, uint32_t *addr, uint32_t offset);
+int b_bit_handle(arm_core p, uint8_t l, uint8_t b, uint32_t *addr, uint8_t rd);
+int arm_load_immediate_offset(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rd, uint32_t *addr, uint32_t offset);
+int arm_load_immediate_preindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset);
+int arm_load_immediate_postindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset);
+int arm_store_immediate_offset(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rd, uint32_t *addr, uint32_t offset);
+int arm_store_immediate_preindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset);
+int arm_store_immediate_postindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset);
+
+void u_bit_handle(uint8_t u, uint32_t *addr, uint32_t offset)
+{
+    if (u)
+    {
         *addr += offset;
-    } else {
+    }
+    else
+    {
         *addr -= offset;
     }
 }
 
-void b_bit_handle(arm_core p, uint8_t l,uint8_t b, uint32_t *addr, uint8_t rd) {
-    uint32_t success, value_word;
-    uint8_t value_byte;
-    if (l) {
-        if (b) {
-            if (arm_read_byte(p, *addr, &value_byte) == 0) {
-                arm_write_register(p, rd, value_byte);
-            }
-        } else {
-            if (arm_read_word(p, *addr, &value_word) == 0) {
-                arm_write_register(p, rd, value_word);
-            }
-        }
-    } else {
-        if (b == 1) {
-            value_byte = (uint8_t)arm_read_register(p, rd);
-            success = arm_write_byte(p, *addr, value_byte);
-        } else {
-            value_word = arm_read_register(p, rd);
-            success = arm_write_word(p, *addr, value_word);
-        }
+int b_bit_handle(arm_core p, uint8_t l, uint8_t b, uint32_t *addr, uint8_t rd)
+{
+    uint32_t value_word = 0;
+    uint8_t value_byte = 0;
+    int err = 0;
 
-        if (success != 0) {
-            // Segmentation fault ?
+    if (l)
+    {
+        if (b)
+        {
+            err = arm_read_byte(p, *addr, &value_byte);
+            if (err)
+            {
+                return err;
+            }
+            arm_write_register(p, rd, value_byte);
+        }
+        else
+        {
+            err = arm_read_word(p, *addr, &value_word);
+            if (err)
+            {
+                return err;
+            }
+
+            arm_write_register(p, rd, value_word);
         }
     }
+    else
+    {
+        if (b == 1)
+        {
+            value_byte = (uint8_t)arm_read_register(p, rd);
+            err = arm_write_byte(p, *addr, value_byte);
+        }
+        else
+        {
+            value_word = arm_read_register(p, rd);
+            err = arm_write_word(p, *addr, value_word);
+        }
+    }
+    return err;
 }
 
-void arm_load_immediate_offset(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rd, uint32_t *addr, uint32_t offset) {
+int arm_load_immediate_offset(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rd, uint32_t *addr, uint32_t offset)
+{
     u_bit_handle(u, addr, offset);
 
-    uint32_t success, value;
-
-    b_bit_handle(p, l, b, addr, rd);
+    return b_bit_handle(p, l, b, addr, rd);
 }
 
-void arm_load_immediate_preindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset) {
-    arm_load_immediate_offset(p, l, u, b, rd, addr, offset);
-    arm_write_register(p, rn, *addr);
+int arm_load_immediate_preindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset)
+{
+    int err = arm_load_immediate_offset(p, l, u, b, rd, addr, offset);
+    if (err)
+    {
+        return err;
+    }
+    err = arm_write_register(p, rn, *addr);
+
+    return err;
 }
 
-void arm_load_immediate_postindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset) {
-    b_bit_handle(p, l, b, addr, rd);
+int arm_load_immediate_postindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset)
+{
+    int err = b_bit_handle(p, l, b, addr, rd);
+    if (!err)
+    {
+        u_bit_handle(u, addr, offset);
+        arm_write_register(p, rn, *addr);
+    }
+    return err;
+}
 
+int arm_store_immediate_offset(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rd, uint32_t *addr, uint32_t offset)
+{
     u_bit_handle(u, addr, offset);
-    arm_write_register(p, rn, *addr);
+    return b_bit_handle(p, l, b, addr, rd);
 }
 
-void arm_store_immediate_offset(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rd, uint32_t *addr, uint32_t offset) {
-    u_bit_handle(u, addr, offset);
-
-    uint8_t value_byte;
-    uint32_t value_word, success;
-
-
-}
-void arm_store_immediate_preindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset) {
+int arm_store_immediate_preindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset)
+{
     arm_store_immediate_offset(p, l, u, b, rd, addr, offset);
     arm_write_register(p, rn, *addr);
 }
 
-void arm_store_immediate_postindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset) {
-    b_bit_handle(p, l, b, addr, rd);
+int arm_store_immediate_postindexing(arm_core p, uint8_t l, uint8_t u, uint8_t b, uint8_t rn, uint8_t rd, uint32_t *addr, uint32_t offset)
+{
+    int err = b_bit_handle(p, l, b, addr, rd);
+    if (err)
+    {
+        return err;
+    }
 
     u_bit_handle(u, addr, offset);
+
     arm_write_register(p, rn, *addr);
 }
 
-int arm_load_store_immediate_offset(arm_core p, uint32_t ins) {
+int arm_load_store_immediate_offset(arm_core p, uint32_t ins)
+{
     uint8_t p_bit = get_bit(ins, P_SHIFT);
     uint8_t u_bit = get_bit(ins, U_SHIFT);
     uint8_t b_bit = get_bit(ins, B_SHIFT);
@@ -127,46 +172,102 @@ int arm_load_store_immediate_offset(arm_core p, uint32_t ins) {
     uint8_t register_d = get_bits(ins, 15, 12);
     uint32_t offset = get_bits(ins, 11, 0);
     uint32_t address_base = arm_read_register(p, register_n);
+    int err;
 
-    if (l_bit == 1) { // LDR{B}
-        if (p_bit == 1) { // Pre-indexing or Offset
-            if (w_bit == 1) { // Pre-indexing   
-                arm_load_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
-            } else { // Offset
-                arm_load_immediate_offset(p, l_bit, u_bit, b_bit, register_d, &address_base, offset);
+    if (l_bit == 1)
+    { // LDR{B}
+        if (p_bit == 1)
+        { // Pre-indexing or Offset
+            if (w_bit == 1)
+            { // Pre-indexing
+                err = arm_load_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
             }
-        } else { // (p_bit == 0) 
-            if (w_bit == 1) {
-                return UNDEFINED_INSTRUCTION;
-            } else { 
-                arm_load_immediate_postindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+            else
+            { // Offset
+                err = arm_load_immediate_offset(p, l_bit, u_bit, b_bit, register_d, &address_base, offset);
             }
         }
-    } else { // STR{B}
-        if (p_bit == 1) { // Pre-indexing or Offset
-            if (w_bit == 1) { // Pre-indexing   
-                arm_store_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
-            } else { // Offset
-                arm_store_immediate_offset(p, l_bit, u_bit, b_bit, register_d, &address_base, offset);
+        else
+        { // (p_bit == 0)
+            if (w_bit == 1)
+            {
+                err = UNDEFINED_INSTRUCTION;
             }
-        } else { // (p_bit == 0) 
-            if (w_bit == 1) {
-                return UNDEFINED_INSTRUCTION;
-            } else {
-                arm_store_immediate_postindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+            else
+            {
+                err = arm_load_immediate_postindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
             }
         }
     }
-    return UNDEFINED_INSTRUCTION;
+    else
+    { // STR{B}
+        if (p_bit == 1)
+        { // Pre-indexing or Offset
+            if (w_bit == 1)
+            { // Pre-indexing
+                err = arm_store_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+            }
+            else
+            { // Offset
+                err = arm_store_immediate_offset(p, l_bit, u_bit, b_bit, register_d, &address_base, offset);
+            }
+        }
+        else
+        { // (p_bit == 0)
+            if (w_bit == 1)
+            {
+                err = UNDEFINED_INSTRUCTION;
+            }
+            else
+            {
+                err = arm_store_immediate_postindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+            }
+        }
+    }
+    return err;
 }
 
-int arm_load_store_miscellaneous_register_offset(arm_core p, uint32_t ins)
+// int arm_load_store_register_offset(arm_core p, uint32_t ins)
+// {
+//     uint8_t p_bit = get_bit(ins, P_SHIFT);
+//     uint8_t u_bit = get_bit(ins, U_SHIFT);
+//     uint8_t b_bit = get_bit(ins, B_SHIFT);
+//     uint8_t w_bit = get_bit(ins, W_SHIFT);
+//     uint8_t l_bit = get_bit(ins, L_SHIFT);
+//     uint8_t lpw_bits = get_bit(ins, L_SHIFT) << 2 | get_bit(ins, P_SHIFT) << 1 | get_bit(ins, W_SHIFT);
+
+//     uint8_t register_n = get_bits(ins, 19, 16);
+//     uint8_t register_d = get_bits(ins, 15, 12);
+//     uint8_t register_m = get_bits(ins, 3, 0);
+//     uint32_t offset = arm_read_register(p, register_m);
+//     uint32_t address_base = arm_read_register(p, register_n);
+
+//     int err;
+
+//     switch (lpw_bits) {
+//         case 0b000: // L 0 -> Store // P 0 -> Postindexing // Wdoit etre a 0
+//             err = arm_store_immediate_postindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+//         case 0b001:
+
+//             err =        case 0b010:
+//         case 0b011:
+//         case 0b100:
+//         case 0b101:
+//         case 0b110:
+//         case 0b111:
+//             break;
+//     }
+
+//     return UNDEFINED_INSTRUCTION;
+// }
+
+int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
 {
     // Get parameters
     uint8_t p_bit = get_bit(ins, P_SHIFT);
     uint8_t u_bit = get_bit(ins, U_SHIFT);
     uint8_t w_bit = get_bit(ins, W_SHIFT);
-    uint8_t  b_bits = get_bit(ins, B_SHIFT);
+    uint8_t b_bits = get_bit(ins, B_SHIFT);
     uint8_t lsh_bits = get_bit(ins, L_SHIFT) << 2 | get_bit(ins, 6) << 1 | get_bit(ins, 5);
 
     uint8_t rn = get_bits(ins, RN_SHIFT + 3, RN_SHIFT);
@@ -223,7 +324,7 @@ int arm_load_store_miscellaneous_register_offset(arm_core p, uint32_t ins)
         {
             address = arm_read_register(p, rn) + arm_read_register(p, op0);
         }
-        else
+        else // Come il est beau
         {
             address = arm_read_register(p, rn) - arm_read_register(p, op0);
         }
@@ -261,30 +362,30 @@ int arm_load_store_miscellaneous_register_offset(arm_core p, uint32_t ins)
 
     switch (lsh_bits) // NB: If lsh_bits == 5 or lsh_bits == 0 then addressing mode 2
     {
-        case 1: // Store half word, L = 0, S = 0, H = 1
-            arm_read_register(p, rd);
-            err = arm_write_half(p, address, (uint16_t) val);
-            break;
-        case 2: // Load double word, L = 0, S = 1, H = 0
-            err = UNDEFINED_INSTRUCTION;
-            break;
-        case 3: // Store double word, L = 0, S = 1, H = 1
-            err = UNDEFINED_INSTRUCTION;
-            break;
-        case 5: // Load unsigned half word, L = 1, S = 0, H = 1
-            err = arm_read_half(p, address, (uint16_t *)&val);
-            arm_write_register(p, rd, val);
-            break;
-        case 6: // Load signed byte, L = 1, S = 1, H = 0
-            err = arm_read_byte(p, address, (uint8_t *)&val);
-            arm_write_register(p, rd, val);
-            break;
-        case 7: // Load signed half word, L = 1, S = 1, H = 1
-            err = arm_read_half(p, address, (uint16_t *)&val);
-            arm_write_register(p, rd, val);
-            break;
-        default:
-            err = UNDEFINED_INSTRUCTION;
+    case 1: // Store half word, L = 0, S = 0, H = 1
+        val = (int16_t)arm_read_register(p, rd);
+        err = arm_write_half(p, address, (int16_t)val);
+        break;
+    case 2: // Load double word, L = 0, S = 1, H = 0
+        err = UNDEFINED_INSTRUCTION;
+        break;
+    case 3: // Store double word, L = 0, S = 1, H = 1
+        err = UNDEFINED_INSTRUCTION;
+        break;
+    case 5: // Load unsigned half word, L = 1, S = 0, H = 1
+        err = arm_read_half(p, address, (uint16_t *)&val);
+        arm_write_register(p, rd, (uint16_t)val);
+        break;
+    case 6: // Load signed byte, L = 1, S = 1, H = 0
+        err = arm_read_byte(p, address, (uint8_t *)&val);
+        arm_write_register(p, rd, (int8_t)val);
+        break;
+    case 7: // Load signed half word, L = 1, S = 1, H = 1
+        err = arm_read_half(p, address, (int16_t *)&val);
+        arm_write_register(p, rd, (int16_t)val);
+        break;
+    default:
+        err = UNDEFINED_INSTRUCTION;
     }
 
     return err;
