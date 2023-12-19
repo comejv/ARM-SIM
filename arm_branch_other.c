@@ -63,13 +63,16 @@ int arm_miscellaneous(arm_core p, uint32_t ins)
     uint32_t Rd = get_bits(ins, 15, 12);
     if (get_bit(ins, 22))
     {
-        uint32_t CPSR_value = arm_read_cpsr(p);
-        arm_write_register(p, Rd, CPSR_value);
+        if (!arm_current_mode_has_spsr(p)){
+            return DATA_ABORT;
+        }
+        uint32_t SPSR_value = arm_read_spsr(p);
+        arm_write_register(p, Rd, SPSR_value);
     }
     else
     {
-        uint32_t SPSR_value = arm_read_register(p, SPSR);
-        arm_write_register(p, Rd, SPSR_value);
+        uint32_t CPSR_value = arm_read_cpsr(p);
+        arm_write_register(p, Rd, CPSR_value);
     }
+    return 0;
 }
-

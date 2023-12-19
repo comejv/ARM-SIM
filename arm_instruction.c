@@ -51,11 +51,12 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
             if (opcode2b == 2 && S == 0)
             {
                 // Misceallaneous instruction (1)
+                CODE_ERREUR = arm_miscellaneous(p, inst);
             }
             else
             {
                 // Data processing immediate shift
-                CODE_ERREUR = arm_data_processing_immediate_shift(p, inst);
+                //CODE_ERREUR = arm_data_processing_immediate_shift(p, inst);
             }
         }
         else
@@ -69,7 +70,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
                 else
                 {
                     // Data processing register shift
-                    arm_data_processing_register_shift(p, inst);
+                    //arm_data_processing_register_shift(p, inst);
                 }
             }
             else
@@ -82,7 +83,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
                 else
                 {
                     // Extra load/stores
-                    CODE_ERREUR = arm_load_store_miscellaneous(p, inst);
+                    //CODE_ERREUR = arm_load_store_miscellaneous(p, inst);
                 }
             }
         }
@@ -102,18 +103,18 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
         else
         {
             // Data processing immediate
-            arm_data_processing_immediate(p, inst);
+            //arm_data_processing_immediate(p, inst);
         }
         break;
     case 0x2:
         // Load/Store immediate offset
-        CODE_ERREUR = arm_load_store_immediate_offset(p, inst);
+        //CODE_ERREUR = arm_load_store_immediate_offset(p, inst);
         break;
     case 0x3:
         if (b4 == 0)
         {
             // Load/Store register offset
-            CODE_ERREUR = arm_load_store_register_offset(p, inst);
+            //CODE_ERREUR = arm_load_store_register_offset(p, inst);
         }
         else
         {
@@ -130,7 +131,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
         break;
     case 0x4:
         // Load/Store multiple
-        CODE_ERREUR = arm_load_store_multiple(p, inst);
+        //CODE_ERREUR = arm_load_store_multiple(p, inst);
         break;
     case 0x5:
         // Branch and branch with link
@@ -155,6 +156,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
         else
         {
             // Software interrupt
+            CODE_ERREUR = arm_coprocessor_others_swi(p, inst);
         }
         break;
     default:
