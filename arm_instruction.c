@@ -83,7 +83,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
                 else
                 {
                     // Extra load/stores
-                    //CODE_ERREUR = arm_load_store_miscellaneous(p, inst);
+                    CODE_ERREUR = arm_load_store_miscellaneous(p, inst);
                 }
             }
         }
@@ -108,7 +108,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
         break;
     case 0x2:
         // Load/Store immediate offset
-        //CODE_ERREUR = arm_load_store_immediate_offset(p, inst);
+        CODE_ERREUR = arm_load_store_immediate_offset(p, inst);
         break;
     case 0x3:
         if (b4 == 0)
