@@ -22,12 +22,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: memory-test
-          path: ./memory_test
       - name: Archive registers_test artifacts
         uses: actions/upload-artifact@v2
         with:
           name: registers-test
-          path: ./registers_test
 
   memory_test:
     name: Memory test
@@ -40,10 +38,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: memory-test
-          path: ./memory_test
+          path: .
       - name: Run memory test and check return code
         run: |
           ls -l
+          ls -l memory_test
           ./memory_test
           if [ $? -ne 0 ]; then
             echo "Memory test failed!"
@@ -61,10 +60,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: registers-test
-          path: ./registers_test
+          path: .
       - name: Run registers test and check return code
         run: |
           ls -l
+          ls -l registers_check
           ./registers_check
           if [ $? -ne 0 ]; then
             echo "Registers test failed!"
