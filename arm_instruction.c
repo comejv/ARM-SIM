@@ -78,7 +78,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
                 // Multiplies; Extra load/stores
                 if (b5 == 0 && b6 == 0)
                 {
-                    // Multiplies
+                    CODE_ERREUR = arm_multiply(p, inst);
                 }
                 else
                 {
@@ -179,33 +179,33 @@ static int arm_execute_instruction(arm_core p)
         uint8_t cpsr_N = get_bit(cpsr, N);
         uint8_t cpsr_C = get_bit(cpsr, C);
         uint8_t cpsr_V = get_bit(cpsr, V);
-        if (cond_inst == EQ && Z == 1)
+        if (cond_inst == EQ && cpsr_Z == 1)
             FLAG_COND = 1;
-        else if (cond_inst == NE && Z == 0)
+        else if (cond_inst == NE && cpsr_Z == 0)
             FLAG_COND = 1;
-        else if (cond_inst == CS && C == 1)
+        else if (cond_inst == CS && cpsr_C == 1)
             FLAG_COND = 1;
-        else if (cond_inst == CC && C == 0)
+        else if (cond_inst == CC && cpsr_C == 0)
             FLAG_COND = 1;
-        else if (cond_inst == MI && N == 1)
+        else if (cond_inst == MI && cpsr_N == 1)
             FLAG_COND = 1;
-        else if (cond_inst == PL && N == 0)
+        else if (cond_inst == PL && cpsr_N == 0)
             FLAG_COND = 1;
-        else if (cond_inst == VS && V == 1)
+        else if (cond_inst == VS && cpsr_V == 1)
             FLAG_COND = 1;
-        else if (cond_inst == VC && V == 0)
+        else if (cond_inst == VC && cpsr_V == 0)
             FLAG_COND = 1;
-        else if (cond_inst == HI && C == 1 && Z == 0)
+        else if (cond_inst == HI && cpsr_C == 1 && cpsr_Z == 0)
             FLAG_COND = 1;
-        else if (cond_inst == LS && C == 1 && Z == 1)
+        else if (cond_inst == LS && cpsr_C == 1 && cpsr_Z == 1)
             FLAG_COND = 1;
-        else if (cond_inst == GE && N == V)
+        else if (cond_inst == GE && cpsr_N == cpsr_V)
             FLAG_COND = 1;
-        else if (cond_inst == LT && N != V)
+        else if (cond_inst == LT && cpsr_N != cpsr_V)
             FLAG_COND = 1;
-        else if (cond_inst == GT && Z == 0 && N == V)
+        else if (cond_inst == GT && cpsr_Z == 0 && cpsr_N == cpsr_V)
             FLAG_COND = 1;
-        else if (cond_inst == LE && (Z == 1 || N != V))
+        else if (cond_inst == LE && (cpsr_Z == 1 || cpsr_N != cpsr_V))
             FLAG_COND = 1;
         else if (cond_inst == AL)
             FLAG_COND = 1;
@@ -218,7 +218,9 @@ static int arm_execute_instruction(arm_core p)
             return 1;
         }
     }
+    return 0;
 }
+
 
 int arm_step(arm_core p)
 {
