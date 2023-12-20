@@ -42,7 +42,7 @@ jobs:
           name: memory-test
       - name: Run memory test and check return code
         run: |
-          ./memory_check
+          ./memory_test
           if [ $? -ne 0 ]; then
             echo "Memory test failed!"
             exit 1
