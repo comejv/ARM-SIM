@@ -10,7 +10,7 @@ The simulator (server) and `arm-none-eabi-gdb` (client) interact via a TCP/IP ne
 
 ## Installation
 
-To install the project first download the repository, then in the project directory run `./configure CFLAGS=’-Wall -Werror -g’` and `make`. You should obtain an executable file `./arm_simulator`.
+To install the project first download the repository, then in the project directory run `autoreconf && ./configure CFLAGS='-Wall -Werror -g'` and then you can `make`. You should obtain an executable file `./arm_simulator`.
 
 ## Usage
 
@@ -41,7 +41,14 @@ in the first lines of Makefile.am, then make clean && make.
 
 ## Testing
 
-Once the project is in a more mature state, instructions for running tests will be provided here.
+Tests are available for these features :
+- [X] Simulated memory : `./memory_test`
+- [X] Registers : `./registers_test`
+- [ ] Memory access
+- [ ] Branch and link
+- [ ] Arithmetic instructions
+- [ ] Inter register instructions
+- [ ] Coprocessor instructions
 
 ## Acknowledgements
 
