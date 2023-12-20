@@ -45,7 +45,7 @@ jobs:
           name: memory_test
       - name: Run memory test and check return code
         run: |
-          ./memory_test/memory_test
+          ./memory_test
           if [ $? -ne 0 ]; then
             echo "Memory test failed!"
             exit 1
@@ -64,7 +64,7 @@ jobs:
           name: registers_test
       - name: Run registers test and check return code
         run: |
-          ./registers_test/registers_test
+          ./registers_test
           if [ $? -ne 0 ]; then
             echo "Registers test failed!"
             exit 1
