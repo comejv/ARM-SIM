@@ -93,7 +93,7 @@ int memory_read_half(memory mem, uint32_t address, uint16_t *value, uint8_t be)
     }
     if (be)
     {
-        *value = (mem->data[address] << 8) | mem->data[address + 1];
+        *value = (mem->data[address] << 7) | mem->data[address + 1];
     }
     else
     {
