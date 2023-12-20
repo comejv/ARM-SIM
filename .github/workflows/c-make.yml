@@ -40,8 +40,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: memory-test
+          path: ./memory_test
       - name: Run memory test and check return code
         run: |
+          ls -l
           ./memory_test
           if [ $? -ne 0 ]; then
             echo "Memory test failed!"
@@ -59,8 +61,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: registers-test
+          path: ./registers_test
       - name: Run registers test and check return code
         run: |
+          ls -l
           ./registers_check
           if [ $? -ne 0 ]; then
             echo "Registers test failed!"
