@@ -48,6 +48,8 @@ main:
 
     // Test with offset
     mov r2, #0x2000
+    mov r3, #0
+    str r3, [r2]
 
     ldrb r3, [r2, #1] // r3 = 0x78
     mov r2, #0x2001
@@ -70,6 +72,7 @@ main:
 
     // Test with post-indexed
     mov r2, #0x2000
+    mov r0, #0x12345678
 
     str r0, [r2], #4 // r0 = 0x12345678
     ldr r3, [r2, #-4]! // r3 = 0x12345678
