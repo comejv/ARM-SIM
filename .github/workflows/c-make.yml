@@ -2,7 +2,7 @@ name: Configure and make
 
 on:
   pull_request:
-    branches: [master]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
