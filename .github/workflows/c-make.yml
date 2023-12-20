@@ -22,10 +22,12 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: memory-test
+          path: memory_test
       - name: Archive registers_test artifacts
         uses: actions/upload-artifact@v2
         with:
           name: registers-test
+          path: registers_test
 
   memory_test:
     name: Memory test
