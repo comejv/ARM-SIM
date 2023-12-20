@@ -56,7 +56,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
             else
             {
                 // Data processing immediate shift
-                //CODE_ERREUR = arm_data_processing_immediate_shift(p, inst);
+                CODE_ERREUR = arm_data_processing_immediate_shift(p, inst);
             }
         }
         else
@@ -70,7 +70,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
                 else
                 {
                     // Data processing register shift
-                    //arm_data_processing_register_shift(p, inst);
+                    CODE_ERREUR = arm_data_processing_register_shift(p, inst);
                 }
             }
             else
@@ -103,7 +103,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
         else
         {
             // Data processing immediate
-            //arm_data_processing_immediate(p, inst);
+            CODE_ERREUR = arm_data_processing_immediate(p, inst);
         }
         break;
     case 0x2:
@@ -215,10 +215,10 @@ static int arm_execute_instruction(arm_core p)
         }
         else
         {
-            return 1;
+            return 0;
         }
     }
-    return 0;
+    return 1;
 }
 
 
