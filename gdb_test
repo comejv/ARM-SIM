@@ -1,0 +1,7 @@
+target remote localhost:69420
+set endian big
+load
+b fail
+b end
+
+stepi
