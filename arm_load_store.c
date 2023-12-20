@@ -236,10 +236,10 @@ int arm_load_store_immediate_offset(arm_core p, uint32_t ins)
 
 int arm_load_store_register_offset(arm_core p, uint32_t ins)
 {
-    uint8_t p_bit = get_bit(ins, P_SHIFT);
+    // uint8_t p_bit = get_bit(ins, P_SHIFT);
     uint8_t u_bit = get_bit(ins, U_SHIFT);
     uint8_t b_bit = get_bit(ins, B_SHIFT);
-    uint8_t w_bit = get_bit(ins, W_SHIFT);
+    // uint8_t w_bit = get_bit(ins, W_SHIFT);
     uint8_t l_bit = get_bit(ins, L_SHIFT);
     uint8_t lpw_bits = get_bit(ins, L_SHIFT) << 2 | get_bit(ins, P_SHIFT) << 1 | get_bit(ins, W_SHIFT);
 
@@ -319,7 +319,7 @@ int arm_load_store_register_offset(arm_core p, uint32_t ins)
             err = arm_load_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
             break;
         default:
-            // It should not exist
+            err = UNDEFINED_INSTRUCTION;
             break;
     }
 
@@ -437,18 +437,18 @@ int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
     case 3: // Store double word, L = 0, S = 1, H = 1
         err = UNDEFINED_INSTRUCTION;
         break;
-    case 5: // Load unsigned half word, L = 1, S = 0, H = 1
-        err = arm_read_half(p, address, (uint16_t *)&val);
-        arm_write_register(p, rd, (uint16_t)val);
-        break;
-    case 6: // Load signed byte, L = 1, S = 1, H = 0
-        err = arm_read_byte(p, address, (uint8_t *)&val);
-        arm_write_register(p, rd, (int8_t)val);
-        break;
-    case 7: // Load signed half word, L = 1, S = 1, H = 1
-        err = arm_read_half(p, address, (int16_t *)&val);
-        arm_write_register(p, rd, (int16_t)val);
-        break;
+    // case 5: // Load unsigned half word, L = 1, S = 0, H = 1
+    //     err = arm_read_half(p, address, (uint16_t *)&val);
+    //     arm_write_register(p, rd, (uint16_t)val);
+    //     break;
+    // case 6: // Load signed byte, L = 1, S = 1, H = 0
+    //     err = arm_read_byte(p, address, (uint8_t *)&val);
+    //     arm_write_register(p, rd, (int8_t)val);
+    //     break;
+    // case 7: // Load signed half word, L = 1, S = 1, H = 1
+    //     err = arm_read_half(p, address, (int16_t *)&val);
+    //     arm_write_register(p, rd, (int16_t)val);
+    //     break;
     default:
         err = UNDEFINED_INSTRUCTION;
     }
@@ -458,7 +458,107 @@ int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
 
 int arm_load_store_multiple(arm_core p, uint32_t ins)
 {
-    return UNDEFINED_INSTRUCTION;
+    uint32_t cpsr = 0;
+    uint32_t value = 0;
+    uint32_t address = 0;
+    int8_t jump = 0;
+    uint8_t number_of_set_bits = 0;
+    int err = 0;
+
+    if (number_of_set_bits == 0) {
+        return UNDEFINED_INSTRUCTION;
+    }
+    // L == 1: LDM(1)
+    if (get_bit(ins, 20)) { 
+        // U == 1: increment
+        if (get_bit(ins, 23)) { 
+            address = arm_read_register(p, get_bits(ins, 19, 16));
+            jump = 4;
+        }
+        // U == 0: decrement
+        else { 
+            // getting the number of set bits in the register list
+            for (int i = 0; i < 16; i++) {
+                if (get_bit(ins, i)) {
+                    number_of_set_bits++;
+                }
+            }
+            address = arm_read_register(p, get_bits(ins, 19, 16)) + 4 * number_of_set_bits;
+            jump = -4;
+        }
+        // P == 1: pre-indexing
+        if (get_bit(ins, 24)) { 
+            address += jump;
+        }
+        // Les load de r0 a r14
+        for (int i = 0; i < 15; i++) {
+            if (get_bit(ins, i)) {
+                err = arm_read_word(p, address, &value);
+                if (err) {
+                    return err;
+                }
+                arm_write_register(p, i, value);
+                address += jump;
+            }           
+        }    
+        // Si load de PC
+        if (get_bit(ins, 15)) {
+            err = arm_read_word(p, address, &value);
+            if (err) {
+                return err;
+            }
+            cpsr = arm_read_cpsr(p);
+
+            if (get_bit(value, 0) && !get_bit(cpsr, 5)) {
+                set_bit(cpsr, 5);
+                arm_write_cpsr(p, cpsr);
+            }
+            else if (!get_bit(value, 0) && get_bit(cpsr, 5)) {
+                clr_bit(cpsr, 5);
+                arm_write_cpsr(p, cpsr);
+            }
+            address += jump;
+        }
+        // W == 1: write back
+        if (get_bit(ins, 21)) { 
+            arm_write_register(p, get_bits(ins, 19, 16), address - jump);
+        }
+    }
+    // L ==0: STM (1)
+    else { 
+        // U == 1: increment
+        if (get_bit(ins, 23)) { 
+            address = arm_read_register(p, get_bits(ins, 19, 16));
+            jump = 4;
+        }
+        // U == 0: decrement
+        else {
+            // getting the number of set bits in the register list
+            for (int i = 0; i < 16; i++) {
+                if (get_bit(ins, i)) {
+                    number_of_set_bits++;
+                }
+            }
+            address = arm_read_register(p, get_bits(ins, 19, 16)) + 4 * number_of_set_bits;
+            jump = -4;
+        }
+        // P == 1: pre-indexing
+        if (get_bit(ins, 24)) { 
+            address += jump;
+        }
+        for (int i = 0; i < 16; i++) {
+            if (get_bit(ins, i)) {
+                value = arm_read_register(p, i);
+                arm_write_word(p, address, value);
+                address += jump;
+            }           
+        }
+        // W == 1: write back
+        if (get_bit(ins, 21)) { 
+            arm_write_register(p, get_bits(ins, 19, 16), address - jump);
+        }
+    }
+    return err;
 }
 
 int arm_coprocessor_load_store(arm_core p, uint32_t ins)
