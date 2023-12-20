@@ -133,90 +133,65 @@ uint8_t borrowFrom(uint32_t op1, uint32_t op2, uint8_t carry)
     }
 }
 
-int apply_operator(arm_core p, uint32_t ins, uint32_t shifter_operand, uint32_t shifter_carry_out)
+int apply_operator(arm_core p, uint8_t opcode, uint8_t Rd, uint32_t Rn_value, uint8_t S, uint32_t shifter_operand, uint32_t shifter_carry_out)
 {
-	uint8_t opcode = get_bits(ins, 24, 21);
-	uint8_t S = get_bit(ins, 20);
-	uint8_t Rd = get_bits(ins, 15, 12);
-	uint8_t Rn = get_bits(ins, 19, 16);
-	uint32_t Rn_value = arm_read_register(p, Rn);
-
     uint8_t update_Rd = 1;
-	uint8_t ZNCVupdatecase;
     uint32_t Rd_value;
     switch (opcode)
     {
     case AND:
         Rd_value = Rn_value & shifter_operand;
-		ZNCVupdatecase = 1;
         break;
     case EOR:
         Rd_value = Rn_value ^ shifter_carry_out;
-		ZNCVupdatecase = 1;
         break;
     case SUB:
         Rd_value = Rn_value - shifter_operand;
-		ZNCVupdatecase = 2;
         break;
     case RSB:
         Rd_value = shifter_operand - Rn_value;
-		ZNCVupdatecase = 2;
         break;
     case ADD:
         Rd_value = Rn_value + shifter_operand;
-		ZNCVupdatecase = 0;
-		break;
     case ADC:
         Rd_value = Rn_value + shifter_operand + get_bit(arm_read_cpsr(p), C);
-        ZNCVupdatecase = 0;
-		break;
+        break;
     case SBC:
         Rd_value = Rn_value - shifter_operand - (~get_bit(arm_read_cpsr(p), C));
-        ZNCVupdatecase = 2;
-		break;
+        break;
     case RSC:
         Rd_value = shifter_operand - Rn_value - (~get_bit(arm_read_cpsr(p), C));
-        ZNCVupdatecase = 2;
-		break;
+        break;
     case TST:
         Rd_value =  Rn_value & shifter_operand;
         update_Rd = 0; // Do not erase Rd content
         S = 1; // Force flags update 
-	    ZNCVupdatecase = 1;
-		break;
+        break;
     case TEQ:
         Rd_value =  Rn_value ^ shifter_operand;
         update_Rd = 0; // Do not erase Rd content
-        S = 1; // Force flags update
-		ZNCVupdatecase = 1;
-		break;   
+        S = 1; // Force flags update         break;   
     case CMP:
         Rd_value = Rn_value - shifter_operand;
         update_Rd = 0; // Do not erase Rd content
-        S = 1; // Force flags update
-		ZNCVupdatecase = 2; 
+        S = 1; // Force flags update 
         break;
     case CMN:
         Rd_value = Rn_value + shifter_operand;
         update_Rd = 0; // Do not erase Rd content
         S = 1; // Force flags update 
-		ZNCVupdatecase = 0;
         break;
     case ORR:
         Rd_value = Rn_value | shifter_operand;
-		ZNCVupdatecase = 1;
         break;
     case MOV:
         Rd_value = shifter_operand;
-		ZNCVupdatecase = 1;
         break;
     case BIC:
         Rd_value = Rn_value & ~shifter_operand;
-		ZNCVupdatecase = 1;
         break;
     case MVN:
-        Rd_value = ~shifter_operand;	
-		ZNCVupdatecase = 1;
+        Rd_value = ~shifter_operand;
         break;
     default:
         return UNDEFINED_INSTRUCTION; // Should not append 
@@ -224,26 +199,10 @@ int apply_operator(arm_core p, uint32_t ins, uint32_t shifter_operand, uint32_t 
     }
     if (update_Rd)
     {
-		if (S && Rd == 15){
-			arm_write_cpsr(p,arm_read_cpsr(p));
-		}
         arm_write_register(p, Rd, Rd_value);
     }
     if (S){
         /* TO DO */
-		set_zn(p, Rd_value);
-		switch (ZNCVupdatecase)
-		{
-		case 0:
-			/* code */
-			break;
-		case 1:
-			break;
-		case 2:
-			break;
-		default:
-			break;
-		}
     }
     return 0;
 }
@@ -252,7 +211,7 @@ void get_shifter_operand_immediate_shift(arm_core p, uint8_t shift_imm, uint8_t 
 {
     switch (shift_code)
     {
-    case LSL: // Logical shift left by immediate (LSL)
+    case 0b000: // Logical shift left by immediate (LSL)
         if (shift_imm == 0)
         {
             *shifter_operand = Rm_value;
@@ -264,7 +223,7 @@ void get_shifter_operand_immediate_shift(arm_core p, uint8_t shift_imm, uint8_t 
             *shift_carry_out = get_bit(Rm_value, 32 - shift_imm);
         }
         break;
-    case LSR: // Logical shift right by immediate (LSR)
+    case 0b010: // Logical shift right by immediate (LSR)
         if (shift_imm == 0)
         {
             *shifter_operand = Rm_value;
@@ -276,7 +235,7 @@ void get_shifter_operand_immediate_shift(arm_core p, uint8_t shift_imm, uint8_t 
             *shift_carry_out = get_bit(Rm_value, shift_imm - 1);
         }
         break;
-    case ASR: // Arithmetic shift right by immediate (ASR)
+    case 0b100: // Arithmetic shift right by immediate (ASR)
         if (shift_imm == 0)
         {
             if (get_bit(Rm_value, 31) == 0)
@@ -296,7 +255,7 @@ void get_shifter_operand_immediate_shift(arm_core p, uint8_t shift_imm, uint8_t 
         }
         break;
 
-    case ROR: // Rotate right by immediate (ROR)
+    case 0b110: // Rotate right by immediate (ROR)
         if (shift_imm == 0)
         {
             *shifter_operand = (get_bit(arm_read_cpsr(p), C) << 31) | (Rm_value >> 1);
@@ -317,8 +276,7 @@ void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t
     uint8_t Rs_significant_bits = get_bits(Rs_value, 7, 0);
     switch (shift_code)
     {
-    case LSL: // Logical shift left by immediate (LSL)
-	
+    case 0b000: // Logical shift left by immediate (LSL)
         if (Rs_significant_bits == 0)
         {
             *shifter_operand = Rm_value;
@@ -339,9 +297,8 @@ void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t
             *shifter_operand = 0;
             *shift_carry_out = 0;
         }
-
         break;
-    case LSR: // Logical shift right by immediate (LSR)
+    case 0b010: // Logical shift right by immediate (LSR)
         if (Rs_significant_bits == 0)
         {
             *shifter_operand = Rm_value;
@@ -363,7 +320,7 @@ void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t
             *shift_carry_out = 0;
         }
         break;
-    case ASR: // Arithmetic shift right by immediate (ASR)
+    case 0b100: // Arithmetic shift right by immediate (ASR)
         if (Rs_significant_bits == 0)
         {
             *shifter_operand = Rm_value;
@@ -387,7 +344,7 @@ void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t
             *shift_carry_out = get_bit(Rm_value, 31);
         }
         break;
-    case ROR: // Rotate right by immediate (ROR)
+    case 0b110: // Rotate right by immediate (ROR)
         if (Rs_significant_bits == 0)
         {
             *shifter_operand = Rm_value;
@@ -412,19 +369,19 @@ void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t
 int arm_data_processing_immediate_shift(arm_core p, uint32_t ins)
 {
     uint8_t shift_imm = get_bits(ins, 11, 7);
-    uint8_t shift_code = get_bits(ins, 6, 5);
+    uint8_t shift_code = get_bits(ins, 6, 4);
     uint8_t Rm = get_bits(ins, 3, 0);
     uint32_t Rm_value = arm_read_register(p, Rm);
-	uint32_t shifter_carry_out;
+    uint32_t shifter_carry_out;
     uint32_t shifter_operand;
 
     get_shifter_operand_immediate_shift(p, shift_imm, shift_code, Rm_value, &shifter_operand, &shifter_carry_out);
-	return apply_operator(p, ins, shifter_operand, shifter_carry_out);
+    return 0;
 }
 
 int arm_data_processing_register_shift(arm_core p, uint32_t ins)
 {
-    uint8_t shift_code = get_bits(ins, 6, 5);
+    uint8_t shift_code = get_bits(ins, 6, 4);
     uint8_t Rm = get_bits(ins, 3, 0);
     uint32_t Rm_value = arm_read_register(p, Rm);
     uint8_t Rs = get_bits(ins, 11, 8);
@@ -433,7 +390,7 @@ int arm_data_processing_register_shift(arm_core p, uint32_t ins)
     uint32_t shifter_carry_out;
 
     get_shifter_operand_register_shift(p, shift_code, Rm_value, Rs_value, &shifter_operand, &shifter_carry_out);
-	return apply_operator(p, ins, shifter_operand, shifter_carry_out);
+    return 0;
 }
 
 int arm_data_processing_immediate(arm_core p, uint32_t ins)
@@ -450,5 +407,4 @@ int arm_data_processing_immediate(arm_core p, uint32_t ins)
     {
         shifter_carry_out = get_bit(shifter_operand, 31);
     }
-	return apply_operator(p, ins, shifter_operand, shifter_carry_out);
 }
