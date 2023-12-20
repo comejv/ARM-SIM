@@ -31,7 +31,7 @@ Contact: Guillaume.Huard@imag.fr
 // Mode 3 = ABORT; 4 = UNDEFINED; 5 = INTERRUPT; 6 = FAST INTERRUPT
  
 #define CPSR 16
-#define SCPSR 17
+#define SPSR 17
 
 /**
  * Data structure that represent a register 
