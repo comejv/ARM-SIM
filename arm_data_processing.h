@@ -43,15 +43,6 @@ Contact: Guillaume.Huard@imag.fr
 #define BIC 0b1110
 #define MVN 0b1111
 
-/**
- * @brief Get the cpsr pointer to the cpsr whithout reading it twice in the same instruction execution
- * 
- * @param p thet machine state that contain registers 
- * @param cpsr_ptr a pointer used to check if cpsr_ptr has been already readed. 
- * @return uint32_t* pointer to cpsr value
- */
-uint32_t *get_cpsr(arm_core p, uint32_t *cpsr_ptr);
-
 
 /**
  * @brief A function that apply the operation using Rn and shifter_operand and store the result (if necesserary) in Rd.
@@ -62,10 +53,10 @@ uint32_t *get_cpsr(arm_core p, uint32_t *cpsr_ptr);
  * @param shifter_operand used as 2nd operand for the data processing operations 
  * @param shifter_carry_out can be used for zncv flags
  * @param S 
- * @param cpsr_ptr a pointer that allow access to cpsr whithout reading it twice (using get_cpsr(cpsr_ptr))
+ * @param cpsr value
  * @return int the error code of the instruction readed (0 if no error)
  */
-int apply_operator(arm_core p, uint32_t ins, uint32_t shifter_operand, uint8_t shifter_carry_out, uint8_t S, uint32_t *cpsr_ptr);
+int apply_operator(arm_core p, uint32_t ins, uint32_t shifter_operand, uint8_t shifter_carry_out, uint8_t S, uint32_t cpsr);
 
 /**
  * @brief Get the shifter operand for immediate shift instruction format 
@@ -77,10 +68,10 @@ int apply_operator(arm_core p, uint32_t ins, uint32_t shifter_operand, uint8_t s
  * @param S the value of the S bit. If 1, we calculate the shift_carry_out. 
  * @param shifter_operand A pointer to modify the shifting operand value 
  * @param shift_carry_out A pointer to modify the shifting carry out value 
- * @param cpsr_ptr A pointer 
+ * @param cpsr cpsr value
  * side effect : modify the value of shifter_operand, shift_carry_out and cpsr_ptr
  */
-void get_shifter_operand_immediate_shift(arm_core p, uint8_t shift_imm, uint8_t shift_code, uint32_t Rm_value, uint8_t S, uint32_t *shifter_operand, uint8_t *shift_carry_out, uint32_t *cpsr_ptr);
+void get_shifter_operand_immediate_shift(arm_core p, uint8_t shift_imm, uint8_t shift_code, uint32_t Rm_value, uint8_t S, uint32_t *shifter_operand, uint8_t *shift_carry_out, uint32_t cpsr);
 
 /**
  * @brief Get the shifter operand for register shift instruction format 
@@ -95,7 +86,7 @@ void get_shifter_operand_immediate_shift(arm_core p, uint8_t shift_imm, uint8_t 
  * @param cpsr_ptr A pointer 
  * side effect : modify the value of shifter_operand, shift_carry_out and cpsr_ptr
  */
-void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t Rm_value, uint32_t Rs_value, uint8_t S, uint32_t *shifter_operand, uint8_t *shift_carry_out, uint32_t *cpsr_ptr);
+void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t Rm_value, uint32_t Rs_value, uint8_t S, uint32_t *shifter_operand, uint8_t *shift_carry_out, uint32_t cpsr);
 
 
 /**
@@ -105,7 +96,7 @@ void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t
  * @param ins the instruction readed
  * @return int, the error code of the instruction reading (0 if no error)
  */
-int arm_data_processing_immediate_shift(arm_core p, uint32_t ins);
+int arm_data_processing_immediate_shift(arm_core p, uint32_t ins, uint32_t cpsr);
 
 /**
  * @brief A handler for data processing instruction using registers with shift 
@@ -114,7 +105,7 @@ int arm_data_processing_immediate_shift(arm_core p, uint32_t ins);
  * @param ins the instruction readed
  * @return int, the error code of the instruction readed (0 if no error)
  */
-int arm_data_processing_register_shift(arm_core p, uint32_t ins);
+int arm_data_processing_register_shift(arm_core p, uint32_t ins, uint32_t cpsr);
 
 /**
  * @brief A handler for data processing instruction using immediate 
@@ -123,6 +114,6 @@ int arm_data_processing_register_shift(arm_core p, uint32_t ins);
  * @param ins the instruction readed
  * @return int the error code of the instruction readed (0 if no error)
  */
-int arm_data_processing_immediate(arm_core p, uint32_t ins);
+int arm_data_processing_immediate(arm_core p, uint32_t ins, uint32_t cpsr);
 
 #endif
