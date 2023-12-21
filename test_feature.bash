@@ -18,7 +18,7 @@ fi
 
 tests=()
 tests+=("Examples/test_ldr_str")
-tests+=("Examples/test_ldoad_store_multiple")
+tests+=("Examples/test_ldm_stm")
 
 for test in "${tests[@]}"; do
     echo -e "\x1b[34mInfo : Running test $test\x1b[0m"

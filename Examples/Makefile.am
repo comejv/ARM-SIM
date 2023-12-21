@@ -22,7 +22,7 @@ endif
 
 insertion_sort_SOURCES=insertion_sort.c my_syscalls.s my_syscalls.h
 test_ldr_str_SOURCES=test_ldr_str.s
-test_load_store_multiple_SOURCES=test_load_store_multiple.s
+test_load_store_multiple_SOURCES=test_ldm_stm.s
 
 EXTRA_DIST=linker_script
 
