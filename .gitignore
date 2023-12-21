@@ -37,6 +37,7 @@ example[0-9]*
 **/*test
 insertion_sort
 Examples/test_*[!.s]
+Examples/some_print
 core
 
 # Debug files
@@ -54,10 +55,11 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# History
+# History and traces
 *.swp
 .gdb_history
 .nfs*
+Examples/trace/
 
 # Automake files
 **/Makefile
