@@ -32,6 +32,7 @@ fi
 
 tests=()
 tests+=("Examples/test_ldr_str")
+tests+=("Examples/test_ldoad_store_multiple")
 
 for test in "${tests[@]}"; do
     echo "Testing $test"
