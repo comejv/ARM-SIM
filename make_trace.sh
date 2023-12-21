@@ -17,3 +17,4 @@ do
  $gdb -ex "file Examples/$base" -x gdb_commands --batch
 done
 zip -9 -j student/traces.zip Examples/trace/*
+ 
