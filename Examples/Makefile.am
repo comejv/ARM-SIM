@@ -24,6 +24,9 @@ example1_SOURCES=example1.s
 example2_SOURCES=example2.s
 example3_SOURCES=example3.s
 example4_SOURCES=example4.s
+test_carry_SOURCES=test_carry.s
+test_or_SOURCES=test_or.s
+test_mvn_SOURCES=test_mvn.s
 insertion_sort_SOURCES=insertion_sort.c my_syscalls.s my_syscalls.h
 ldr_str_test_SOURCES=ldr_str_test.s
 

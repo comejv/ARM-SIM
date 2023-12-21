@@ -32,7 +32,7 @@ int arm_branch(arm_core p, uint32_t ins)
     uint32_t PCvalue = arm_read_register(p, PC);
     if (get_bit(ins, bL))
     {
-        arm_write_register(p, LR, PCvalue); // PC value already updated by fetch
+        arm_write_register(p, LR, PCvalue - 4); // PC value already updated by fetch
     }
     uint32_t bits_23_0 = get_bits(ins, 23, 0);
     uint32_t extended;

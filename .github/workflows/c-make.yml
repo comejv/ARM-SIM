@@ -2,7 +2,7 @@ name: Configure and make
 
 on:
   pull_request:
-    branches: [master]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -15,19 +15,22 @@ jobs:
       - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
         uses: carlosperate/arm-none-eabi-gcc-action@v1
       - name: configure project
-        run: ./configure CFLAGS='-Wall -Werror -g'
+        run: autoreconf && ./configure CFLAGS='-Wall -Werror -g'
       - name: make project
         run: make
       - name: Archive memory_test artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: memory-test
-          path: ./memory_test
+          name: memory_test
+          path: memory_test
+          if-no-files-found: error
+
       - name: Archive registers_test artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: registers-test
-          path: ./registers_test
+          name: registers_test
+          path: registers_test
+          if-no-files-found: error
 
   memory_test:
     name: Memory test
@@ -39,10 +42,11 @@ jobs:
       - name: Download memory check
         uses: actions/download-artifact@v2
         with:
-          name: memory-test
+          name: memory_test
       - name: Run memory test and check return code
         run: |
-          ./memory_check
+          chmod +x memory_test
+          ./memory_test
           if [ $? -ne 0 ]; then
             echo "Memory test failed!"
             exit 1
@@ -58,10 +62,11 @@ jobs:
       - name: Download registers check
         uses: actions/download-artifact@v2
         with:
-          name: registers-test
+          name: registers_test
       - name: Run registers test and check return code
         run: |
-          ./registers_check
+          chmod +x registers_test
+          ./registers_test
           if [ $? -ne 0 ]; then
             echo "Registers test failed!"
             exit 1
