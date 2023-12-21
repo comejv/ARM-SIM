@@ -105,8 +105,16 @@ jobs:
           name: arm_simulator
       - name: Run test_ldm_stm and check return code
         run: |
-          mv ldm_stm_test/Examples/test_ldm_stm Examples/
+          echo "*** Examples : ***"
+          ls -l Examples/
+          echo "*** ldm_stm_test : ***"
+          ls -l ldm_stm_test/
+          echo "*** arm_simulator : ***"
+          ls -l arm_simulator/
+          mv ldm_stm_test/test_ldm_stm Examples/
           mv arm_simulator/arm_simulator .
+          echo "*** Examples : ***"
+          ls -l Examples/
           chmod +x arm_simulator
           bash test_feature.bash
           if [ $? -ne 0 ]; then
