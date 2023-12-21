@@ -23,7 +23,7 @@ tests+=("Examples/test_ldoad_store_multiple")
 for test in "${tests[@]}"; do
     echo -e "\x1b[34mInfo : Running test $test\x1b[0m"
 
-    ./arm_simulator --gdb-port 28546
+    ./arm_simulator --gdb-port 28546 &
     if [[ $? -ne 0 ]]; then
         echo -e "\x1b[1;31mError: arm_simulator failed to start\x1b[0m"
         exit 1
