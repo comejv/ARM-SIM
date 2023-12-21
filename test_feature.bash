@@ -31,7 +31,7 @@ if [ $? -ne 0 ]; then
 fi
 
 tests=()
-tests+=("Examples/example1")
+tests+=("Examples/test_ldr_str")
 
 for test in "${tests[@]}"; do
     echo "Testing $test"

@@ -63,7 +63,8 @@ int arm_miscellaneous(arm_core p, uint32_t ins)
     uint32_t Rd = get_bits(ins, 15, 12);
     if (get_bit(ins, 22))
     {
-        if (!arm_current_mode_has_spsr(p)){
+        if (!arm_current_mode_has_spsr(p))
+        {
             return DATA_ABORT;
         }
         uint32_t SPSR_value = arm_read_spsr(p);
@@ -77,18 +78,36 @@ int arm_miscellaneous(arm_core p, uint32_t ins)
     return 0;
 }
 
-int arm_multiply(arm_core p, uint32_t ins){
-	uint8_t Rd = get_bits(ins, 19, 16);
-	uint8_t Rs = get_bits(ins, 11, 8);
-	uint8_t Rm = get_bits(ins, 3, 0);
-	uint8_t S = get_bit(ins, 4);
+int arm_multiply(arm_core p, uint32_t ins, uint32_t cpsr)
+{
+    uint8_t Rd = get_bits(ins, 19, 16);
+    uint8_t Rs = get_bits(ins, 11, 8);
+    uint8_t Rm = get_bits(ins, 3, 0);
+    uint8_t S = get_bit(ins, 4);
 
-	uint32_t Rs_v = arm_read_register(p, Rs);
-	uint32_t Rm_v = arm_read_register(p, Rm);
-	uint32_t Rd_v = Rs_v * Rm_v;
-	arm_write_register(p, Rd, Rd_v);
-	if (S == 1){
-		//set_zn(p, Rd_v)
-	}	
-	return 0;
-};
+    uint32_t Rs_v = arm_read_register(p, Rs);
+    uint32_t Rm_v = arm_read_register(p, Rm);
+    uint32_t Rd_v = Rs_v * Rm_v;
+    arm_write_register(p, Rd, Rd_v);
+    if (S == 1)
+    {
+        if (get_bit(Rd_v, 31) == 0)
+        {
+            cpsr = clr_bit(cpsr, C);
+        }
+        else
+        {
+            cpsr = set_bit(cpsr, C);
+        }
+        if (Rd_v == 0)
+        {
+            cpsr = set_bit(cpsr, Z);
+        }
+        else
+        {
+            cpsr = clr_bit(cpsr, Z);
+        }
+        arm_write_cpsr(p, cpsr);
+    }
+    return 0;
+}

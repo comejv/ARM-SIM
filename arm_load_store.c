@@ -179,7 +179,7 @@ int arm_load_store_immediate_offset(arm_core p, uint32_t ins)
     uint32_t offset = get_bits(ins, 11, 0);
     uint32_t address_base = arm_read_register(p, register_n);
     int err;
-
+    debug("arm_load_store_immediate_offset with ins %x\n", ins);
     if (l_bit == 1)
     { // LDR{B}
         if (p_bit == 1)
@@ -208,8 +208,7 @@ int arm_load_store_immediate_offset(arm_core p, uint32_t ins)
     else
     { // STR{B}
         if (p_bit == 1)
-        { // Pre-indexing or Offset
-            debug("Store pre-indexing or Offset\n");
+        { // Pre-indexing or Offset 
             if (w_bit == 1)
             { // Pre-indexing
                 err = arm_store_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
@@ -241,7 +240,7 @@ int arm_load_store_register_offset(arm_core p, uint32_t ins)
     uint8_t b_bit = get_bit(ins, B_SHIFT);
     // uint8_t w_bit = get_bit(ins, W_SHIFT);
     uint8_t l_bit = get_bit(ins, L_SHIFT);
-    uint8_t lpw_bits = get_bit(ins, L_SHIFT) << 2 | get_bit(ins, P_SHIFT) << 1 | get_bit(ins, W_SHIFT);
+    uint8_t lpw_bits = l_bit << 2 | p_bit << 1 | w_bit;
 
     uint8_t register_n = get_bits(ins, 19, 16);
     uint8_t register_d = get_bits(ins, 15, 12);
@@ -253,8 +252,9 @@ int arm_load_store_register_offset(arm_core p, uint32_t ins)
     uint32_t address_base = arm_read_register(p, register_n);
 
     uint8_t scaled = (uint8_t)shift_imm & (uint8_t)shift & (uint8_t)bit_4;
-    int err;
+    int err = 0;
     
+    debug("arm_load_store_register_offset with ins %x\n", ins);
     if (scaled != 0) {
         switch (shift)
         {
@@ -327,7 +327,8 @@ int arm_load_store_register_offset(arm_core p, uint32_t ins)
 }
 
 int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
-{
+{   
+    debug("arm_load_store_miscellaneous with ins %x\n", ins);
     // Get parameters
     uint8_t p_bit = get_bit(ins, P_SHIFT);
     uint8_t u_bit = get_bit(ins, U_SHIFT);
@@ -335,8 +336,10 @@ int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
     uint8_t b_bits = get_bit(ins, B_SHIFT);
     uint8_t lsh_bits = get_bit(ins, L_SHIFT) << 2 | get_bit(ins, 6) << 1 | get_bit(ins, 5);
 
-    uint8_t rn = get_bits(ins, RN_SHIFT + 3, RN_SHIFT);
-    uint8_t rd = get_bits(ins, RD_SHIFT + 3, RN_SHIFT);
+    // uint8_t rn = get_bits(ins, RN_SHIFT + 3, RN_SHIFT);
+    // uint8_t rd = get_bits(ins, RD_SHIFT + 3, RN_SHIFT);
+    uint8_t rn = get_bits(ins, 19, 16);
+    uint8_t rd = get_bits(ins, 15, 12);
 
     uint8_t op1 = get_bits(ins, 8 + 3, 8);
     uint8_t op0 = get_bits(ins, 0 + 3, 0);
@@ -344,7 +347,9 @@ int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
     uint32_t address = 0;
     uint8_t offset = 0;
 
-    uint32_t val = 0;
+    uint32_t signed_mask = 0;
+    uint16_t value_half = 0;
+    uint8_t value_byte = 0;
     int err = 0;
 
     // Check instruction type
@@ -382,6 +387,7 @@ int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
         {
             address = arm_read_register(p, rn) - offset;
         }
+        arm_write_register(p, rn, address);
     }
     else if (p_bit && !b_bits && w_bit) // Register pre indexed
     {
@@ -428,8 +434,8 @@ int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
     switch (lsh_bits) // NB: If lsh_bits == 5 or lsh_bits == 0 then addressing mode 2
     {
     case 1: // Store half word, L = 0, S = 0, H = 1
-        val = (int16_t)arm_read_register(p, rd);
-        err = arm_write_half(p, address, (int16_t)val);
+        value_half = (uint16_t)arm_read_register(p, rd);
+        err = arm_write_half(p, address, value_half);
         break;
     case 2: // Load double word, L = 0, S = 1, H = 0
         err = UNDEFINED_INSTRUCTION;
@@ -437,20 +443,27 @@ int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
     case 3: // Store double word, L = 0, S = 1, H = 1
         err = UNDEFINED_INSTRUCTION;
         break;
-    // case 5: // Load unsigned half word, L = 1, S = 0, H = 1
-    //     err = arm_read_half(p, address, (uint16_t *)&val);
-    //     arm_write_register(p, rd, (uint16_t)val);
-    //     break;
-    // case 6: // Load signed byte, L = 1, S = 1, H = 0
-    //     err = arm_read_byte(p, address, (uint8_t *)&val);
-    //     arm_write_register(p, rd, (int8_t)val);
-    //     break;
-    // case 7: // Load signed half word, L = 1, S = 1, H = 1
-    //     err = arm_read_half(p, address, (int16_t *)&val);
-    //     arm_write_register(p, rd, (int16_t)val);
-    //     break;
+    case 5: // Load unsigned half word, L = 1, S = 0, H = 1
+        err = arm_read_half(p, address, &value_half);
+        arm_write_register(p, rd, (uint32_t)value_half);
+        break;
+    case 6: // Load signed byte, L = 1, S = 1, H = 0
+        err = arm_read_byte(p, address, &value_byte);
+        if (get_bit(value_byte, 7))
+            signed_mask = ~signed_mask;
+        signed_mask = set_bits(signed_mask, 7, 0, value_byte);
+        arm_write_register(p, rd, signed_mask);
+        break;
+    case 7: // Load signed half word, L = 1, S = 1, H = 1
+        err = arm_read_half(p, address, &value_half);
+        if (get_bit(value_half, 15))
+            signed_mask = ~signed_mask;
+        signed_mask = set_bits(signed_mask, 15, 0, value_half);
+        arm_write_register(p, rd, signed_mask);
+        break;
     default:
-        err = UNDEFINED_INSTRUCTION;
+        // It should'nt happen
+        break;
     }
 
     return err;

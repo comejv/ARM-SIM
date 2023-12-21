@@ -1,0 +1,4 @@
+file Examples/test_ldr_str
+set endian big
+target remote localhost:35287
+load
