@@ -37,6 +37,7 @@ example[0-9]*
 **/*test
 insertion_sort
 Examples/test_*[!.s]
+Examples/some_print
 core
 
 # Debug files
