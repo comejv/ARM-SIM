@@ -31,6 +31,13 @@ jobs:
           name: registers_test
           path: registers_test
           if-no-files-found: error
+      
+      - name: Archive test_ldm_stm
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_ldm_stm
+          path: Examples/test_ldm_stm
+          if-no-files-found: error
 
   memory_test:
     name: Memory test
@@ -69,5 +76,25 @@ jobs:
           ./registers_test
           if [ $? -ne 0 ]; then
             echo "Registers test failed!"
+            exit 1
+          fi
+  
+  test_ldm_stm:
+    name: Test LDM/STM
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download test_ldm_stm
+        uses: actions/download-artifact@v2
+        with:
+          name: test_ldm_stm
+      - name: Run test_ldm_stm and check return code
+        run: |
+          chmod +x test_ldm_stm
+          ./Examples/test_ldm_stm
+          if [ $? -ne 0 ]; then
+            echo "Test LDM/STM failed!"
             exit 1
           fi
