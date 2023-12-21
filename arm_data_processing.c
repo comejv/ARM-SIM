@@ -85,7 +85,7 @@ uint32_t overflowFrom(uint32_t rn_val, uint32_t shifter_op_val, uint8_t opcode, 
     case CMP:
         true_result -= rn_val - shifter_op_val;
         result_sign = get_bit(true_result, 31);
-        if ((rn_sign != ~shifter_op_sign) && (result_sign != rn_sign))
+        if ((rn_sign == shifter_op_sign) && (result_sign != rn_sign))
         {
             cpsr = set_bit(cpsr, V);
         }
@@ -150,11 +150,11 @@ int apply_operator(arm_core p, uint32_t ins, uint32_t shifter_operand, uint8_t s
         ZNCVupdatecase = 0;
         break;
     case SBC:
-        Rd_value = Rn_value - shifter_operand - (~get_bit(cpsr, C));
+        Rd_value = Rn_value - shifter_operand - (!get_bit(cpsr, C));
         ZNCVupdatecase = 2;
         break;
     case RSC:
-        Rd_value = shifter_operand - Rn_value - (~get_bit(cpsr, C));
+        Rd_value = shifter_operand - Rn_value - (!get_bit(cpsr, C));
         ZNCVupdatecase = 2;
         break;
     case TST:
@@ -253,7 +253,8 @@ void get_shifter_operand_immediate_shift(arm_core p, uint8_t shift_imm, uint8_t 
         if (shift_imm == 0)
         {
             *shifter_operand = Rm_value;
-            *shift_carry_out = cpsr;
+            *shift_carry_out = get_bit(cpsr, C);
+            ;
         }
         else
         {
@@ -319,7 +320,7 @@ void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t
         if (Rs_significant_bits == 0)
         {
             *shifter_operand = Rm_value;
-            *shift_carry_out = cpsr;
+            *shift_carry_out = get_bit(cpsr, C);
         }
         else if (Rs_significant_bits < 32)
         {
@@ -342,7 +343,7 @@ void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t
         if (Rs_significant_bits == 0)
         {
             *shifter_operand = Rm_value;
-            *shift_carry_out = cpsr;
+            *shift_carry_out = get_bit(cpsr, C);
         }
         else if (Rs_significant_bits < 32)
         {
@@ -364,7 +365,7 @@ void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t
         if (Rs_significant_bits == 0)
         {
             *shifter_operand = Rm_value;
-            *shift_carry_out = cpsr;
+            *shift_carry_out = get_bit(cpsr, C);
         }
         else if (Rs_significant_bits < 32)
         {
@@ -388,7 +389,7 @@ void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t
         if (Rs_significant_bits == 0)
         {
             *shifter_operand = Rm_value;
-            *shift_carry_out = cpsr;
+            *shift_carry_out = get_bit(cpsr, C);
         }
         else if (get_bits(Rs_value, 4, 0) == 0)
         {
@@ -441,10 +442,9 @@ int arm_data_processing_immediate(arm_core p, uint32_t ins, uint32_t cpsr)
     uint8_t rotate_imm = get_bits(ins, 11, 8);
     uint32_t shifter_operand = ror(immed_8, rotate_imm);
     uint8_t shifter_carry_out = 0;
-    debug("Im here\n");
     if (rotate_imm == 0)
     {
-        shifter_carry_out = cpsr;
+        shifter_carry_out = get_bit(cpsr, C);
     }
     else
     {
