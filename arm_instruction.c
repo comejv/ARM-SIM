@@ -28,7 +28,7 @@ Contact: Guillaume.Huard@imag.fr
 #include "arm_constants.h"
 #include "util.h"
 
-static int arm_fetch_code_inst(arm_core p, uint32_t inst)
+static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
 {
     int CODE_ERREUR = 0;
     uint8_t instcode = get_bits(inst, 27, 25);
@@ -56,7 +56,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
             else
             {
                 // Data processing immediate shift
-                CODE_ERREUR = arm_data_processing_immediate_shift(p, inst);
+                CODE_ERREUR = arm_data_processing_immediate_shift(p, inst, cpsr);
             }
         }
         else
@@ -70,7 +70,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
                 else
                 {
                     // Data processing register shift
-                    CODE_ERREUR = arm_data_processing_register_shift(p, inst);
+                    CODE_ERREUR = arm_data_processing_register_shift(p, inst, cpsr);
                 }
             }
             else
@@ -103,7 +103,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst)
         else
         {
             // Data processing immediate
-            CODE_ERREUR = arm_data_processing_immediate(p, inst);
+            CODE_ERREUR = arm_data_processing_immediate(p, inst, cpsr);
         }
         break;
     case 0x2:
@@ -211,7 +211,7 @@ static int arm_execute_instruction(arm_core p)
             FLAG_COND = 1;
         if (FLAG_COND)
         {
-            return arm_fetch_code_inst(p, inst);
+            return arm_fetch_code_inst(p, inst, cpsr);
         }
         else
         {
