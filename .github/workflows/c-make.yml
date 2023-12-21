@@ -39,6 +39,13 @@ jobs:
           path: Examples/test_ldm_stm
           if-no-files-found: error
       
+      - name: Archive test_ldr_str
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_ldr_str
+          path: Examples/test_ldr_str
+          if-no-files-found: error
+      
       - name: Archive arm_simulator
         uses: actions/upload-artifact@v2
         with:
