@@ -52,8 +52,9 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Vim swap
+# History
 *.swp
+.gdb_history
 
 # Automake files
 **/Makefile
