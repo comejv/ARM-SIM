@@ -99,20 +99,17 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: test_ldm_stm
+      - name: Download test_ldr_str
+        uses: actions/download-artifact@v2
+        with:
+          name: test_ldr_str
       - name: Download arm_simulator
         uses: actions/download-artifact@v2
         with:
           name: arm_simulator
       - name: Run test_ldm_stm and check return code
         run: |
-          echo "*** Current directory : ***"
-          ls -l
           mv test_ldm_stm Examples/
-          echo "*** Examples : ***"
-          ls -l Examples/
+          mv test_ldr_str Examples/
           chmod +x arm_simulator
           bash test_feature.bash
-          if [ $? -ne 0 ]; then
-            echo "Test LDM/STM failed!"
-            exit 1
-          fi
