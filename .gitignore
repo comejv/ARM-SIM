@@ -37,6 +37,7 @@ example*
 **/*test
 insertion_sort
 Examples/test_*[!.s]
+core
 
 # Debug files
 *.dSYM/
@@ -56,6 +57,7 @@ dkms.conf
 # History
 *.swp
 .gdb_history
+.nfs*
 
 # Automake files
 **/Makefile
