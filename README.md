@@ -45,10 +45,10 @@ in the first lines of Makefile.am, then make clean && make.
 Tests are available for these features :
 - [X] Simulated memory : `./memory_test`
 - [X] Registers : `./registers_test`
-- [ ] Memory access
+- [X] Memory access : `bash test_features.bash`
 - [ ] Branch and link
-- [ ] Arithmetic instructions
-- [ ] Inter register instructions
+- [X] Arithmetic instructions : `bash test_features.bash`
+- [X] Inter register instructions : `bash test_features.bash`
 - [ ] Coprocessor instructions
 
 ## Acknowledgements
