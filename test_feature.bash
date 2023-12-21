@@ -20,6 +20,8 @@ tests=()
 tests+=("Examples/test_ldr_str")
 tests+=("Examples/test_ldm_stm")
 
+exit=0
+
 for test in "${tests[@]}"; do
     echo -e "\x1b[34mInfo : Running test $test\x1b[0m"
 
@@ -33,7 +35,10 @@ for test in "${tests[@]}"; do
     ret=$?
     if [[ ret -ne 0 ]]; then
         echo -e "\x1b[1;31mTest $test failed with output $ret\x1b[0m"
+        exit+=1
     else
         echo -e "\x1b[1;32mTest $test passed\x1b[0m"
     fi
 done
+
+exit $exit

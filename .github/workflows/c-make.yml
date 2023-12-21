@@ -92,8 +92,7 @@ jobs:
           name: test_ldm_stm
       - name: Run test_ldm_stm and check return code
         run: |
-          chmod +x test_ldm_stm
-          ./Examples/test_ldm_stm
+          bash test_feature.bash
           if [ $? -ne 0 ]; then
             echo "Test LDM/STM failed!"
             exit 1
