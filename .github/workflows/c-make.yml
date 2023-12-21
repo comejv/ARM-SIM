@@ -107,10 +107,7 @@ jobs:
         run: |
           echo "*** Current directory : ***"
           ls -l
-          echo "*** Examples : ***"
-          ls -l Examples/
-          mv ldm_stm_test/test_ldm_stm Examples/
-          mv arm_simulator/arm_simulator .
+          mv test_ldm_stm Examples/
           echo "*** Examples : ***"
           ls -l Examples/
           chmod +x arm_simulator
