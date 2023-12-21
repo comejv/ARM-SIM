@@ -34,10 +34,18 @@ for test in "${tests[@]}"; do
     ret=$?
     if [[ ret -ne 0 ]]; then
         echo -e "\x1b[1;31mTest $test failed with output $ret\x1b[0m"
-        exit+=1
+        exit=$((exit + 1))
     else
         echo -e "\x1b[1;32mTest $test passed\x1b[0m"
     fi
+    echo "---"
 done
+
+echo "---"
+if [[ $exit -eq 0 ]]; then
+    echo -e "\x1b[1;32mAll tests passed\x1b[0m"
+else
+    echo -e "\x1b[1;31m$exit tests failed\x1b[0m"
+fi
 
 exit $exit

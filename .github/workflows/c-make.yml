@@ -45,6 +45,13 @@ jobs:
           name: test_ldr_str
           path: Examples/test_ldr_str
           if-no-files-found: error
+        
+      - name: Archive test_data_processing
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_data_processing
+          path: Examples/test_data_processing
+          if-no-files-found: error
       
       - name: Archive arm_simulator
         uses: actions/upload-artifact@v2
@@ -110,6 +117,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: test_ldr_str
+      - name: Download test_data_processing
+        uses: actions/download-artifact@v2
+        with:
+          name: test_data_processing
       - name: Download arm_simulator
         uses: actions/download-artifact@v2
         with:
@@ -118,5 +129,6 @@ jobs:
         run: |
           mv test_ldm_stm Examples/
           mv test_ldr_str Examples/
+          mv test_data_processing Examples/
           chmod +x arm_simulator
-          bash test_feature.bash
+          bash test_features.bash
