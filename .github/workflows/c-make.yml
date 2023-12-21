@@ -86,7 +86,7 @@ jobs:
             exit 1
           fi
   
-  ARM tests:
+  arm_simulator_tests:
     name: Test all arm files
     needs: build
     runs-on: ubuntu-latest
