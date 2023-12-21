@@ -55,10 +55,11 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# History
+# History and traces
 *.swp
 .gdb_history
 .nfs*
+Examples/trace/
 
 # Automake files
 **/Makefile
