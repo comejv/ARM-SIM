@@ -471,7 +471,107 @@ int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
 
 int arm_load_store_multiple(arm_core p, uint32_t ins)
 {
-    return UNDEFINED_INSTRUCTION;
+    uint32_t cpsr = 0;
+    uint32_t value = 0;
+    uint32_t address = 0;
+    int8_t jump = 0;
+    uint8_t number_of_set_bits = 0;
+    int err = 0;
+
+    if (number_of_set_bits == 0) {
+        return UNDEFINED_INSTRUCTION;
+    }
+    // L == 1: LDM(1)
+    if (get_bit(ins, 20)) { 
+        // U == 1: increment
+        if (get_bit(ins, 23)) { 
+            address = arm_read_register(p, get_bits(ins, 19, 16));
+            jump = 4;
+        }
+        // U == 0: decrement
+        else { 
+            // getting the number of set bits in the register list
+            for (int i = 0; i < 16; i++) {
+                if (get_bit(ins, i)) {
+                    number_of_set_bits++;
+                }
+            }
+            address = arm_read_register(p, get_bits(ins, 19, 16)) + 4 * number_of_set_bits;
+            jump = -4;
+        }
+        // P == 1: pre-indexing
+        if (get_bit(ins, 24)) { 
+            address += jump;
+        }
+        // Les load de r0 a r14
+        for (int i = 0; i < 15; i++) {
+            if (get_bit(ins, i)) {
+                err = arm_read_word(p, address, &value);
+                if (err) {
+                    return err;
+                }
+                arm_write_register(p, i, value);
+                address += jump;
+            }           
+        }    
+        // Si load de PC
+        if (get_bit(ins, 15)) {
+            err = arm_read_word(p, address, &value);
+            if (err) {
+                return err;
+            }
+            cpsr = arm_read_cpsr(p);
+
+            if (get_bit(value, 0) && !get_bit(cpsr, 5)) {
+                cpsr = set_bit(cpsr, 5);
+                arm_write_cpsr(p, cpsr);
+            }
+            else if (!get_bit(value, 0) && get_bit(cpsr, 5)) {
+                cpsr = clr_bit(cpsr, 5);
+                arm_write_cpsr(p, cpsr);
+            }
+            address += jump;
+        }
+        // W == 1: write back
+        if (get_bit(ins, 21)) { 
+            arm_write_register(p, get_bits(ins, 19, 16), address - jump);
+        }
+    }
+    // L ==0: STM (1)
+    else { 
+        // U == 1: increment
+        if (get_bit(ins, 23)) { 
+            address = arm_read_register(p, get_bits(ins, 19, 16));
+            jump = 4;
+        }
+        // U == 0: decrement
+        else {
+            // getting the number of set bits in the register list
+            for (int i = 0; i < 16; i++) {
+                if (get_bit(ins, i)) {
+                    number_of_set_bits++;
+                }
+            }
+            address = arm_read_register(p, get_bits(ins, 19, 16)) + 4 * number_of_set_bits;
+            jump = -4;
+        }
+        // P == 1: pre-indexing
+        if (get_bit(ins, 24)) { 
+            address += jump;
+        }
+        for (int i = 0; i < 16; i++) {
+            if (get_bit(ins, i)) {
+                value = arm_read_register(p, i);
+                arm_write_word(p, address, value);
+                address += jump;
+            }           
+        }
+        // W == 1: write back
+        if (get_bit(ins, 21)) { 
+            arm_write_register(p, get_bits(ins, 19, 16), address - jump);
+        }
+    }
+    return err;
 }
 
 int arm_coprocessor_load_store(arm_core p, uint32_t ins)

@@ -33,7 +33,7 @@ arm_simulator
 memory_test
 registers_test
 send_irq
-example*
+example[0-9]*
 **/*test
 insertion_sort
 Examples/test_*[!.s]

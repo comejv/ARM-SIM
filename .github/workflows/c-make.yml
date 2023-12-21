@@ -1,4 +1,4 @@
-name: Configure and make
+name: CI CD Tests
 
 on:
   pull_request:
@@ -30,6 +30,27 @@ jobs:
         with:
           name: registers_test
           path: registers_test
+          if-no-files-found: error
+      
+      - name: Archive test_ldm_stm
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_ldm_stm
+          path: Examples/test_ldm_stm
+          if-no-files-found: error
+      
+      - name: Archive test_ldr_str
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_ldr_str
+          path: Examples/test_ldr_str
+          if-no-files-found: error
+      
+      - name: Archive arm_simulator
+        uses: actions/upload-artifact@v2
+        with:
+          name: arm_simulator
+          path: arm_simulator
           if-no-files-found: error
 
   memory_test:
@@ -71,3 +92,31 @@ jobs:
             echo "Registers test failed!"
             exit 1
           fi
+  
+  arm_simulator_tests:
+    name: Test all arm files
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install gdb-multiarch
+        run: sudo apt-get install -y gdb-multiarch
+      - name: Download test_ldm_stm
+        uses: actions/download-artifact@v2
+        with:
+          name: test_ldm_stm
+      - name: Download test_ldr_str
+        uses: actions/download-artifact@v2
+        with:
+          name: test_ldr_str
+      - name: Download arm_simulator
+        uses: actions/download-artifact@v2
+        with:
+          name: arm_simulator
+      - name: Run test_ldm_stm and check return code
+        run: |
+          mv test_ldm_stm Examples/
+          mv test_ldr_str Examples/
+          chmod +x arm_simulator
+          bash test_feature.bash
