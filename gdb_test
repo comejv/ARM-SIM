@@ -1,7 +1,15 @@
-target remote localhost:69420
+target remote localhost:28546
 set endian big
 load
 b fail
 b end
 
+c
+
 stepi
+
+set $ret = $r0
+
+c
+
+q $ret

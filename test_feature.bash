@@ -2,7 +2,21 @@
 
 # This script is used to execute assembly examples and check for their return value through gdb
 
+function cleanup {
+    echo "Cleaning up"
+    kill $(jobs -p)
+}
 
+trap cleanup EXIT
+
+if [[ -x "$(command -v gdb-multiarch)" ]]; then
+    gdb=gdb-multiarch
+elif [[ -x "$(command -v arm-none-eabi-gdb)" ]]; then
+    gdb=arm-none-eabi-gdb
+else
+    echo "No gdb executable found, please install gdb-multiarch or arm-none-eabi-gdb"
+    exit 1
+fi
 
 # Check for simulator executable and start it
 if [ ! -x ./arm_simulator ]; then
@@ -10,16 +24,23 @@ if [ ! -x ./arm_simulator ]; then
     exit 1
 fi
 
-./arm_simulator --gdb-port 69420 &
+./arm_simulator --gdb-port 28546 &
+if [ $? -ne 0 ]; then
+    echo "Failed to start simulator"
+    exit 1
+fi
 
-tests=
-tests+=("example1.s")
+tests=()
+tests+=("Examples/example1")
 
 for test in "${tests[@]}"; do
     echo "Testing $test"
-    gdb --batch -x gdb_test --gdb-port 69420 --args $test
+    $gdb --quiet -x gdb_test --args $test $port
     if [ $? -ne 0 ]; then
         echo "Test $test failed"
+        kill $(jobs -p)
         exit 1
+    else
+        echo "Test $test passed"
     fi
 done
