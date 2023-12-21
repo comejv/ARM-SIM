@@ -179,7 +179,7 @@ int arm_load_store_immediate_offset(arm_core p, uint32_t ins)
     uint32_t offset = get_bits(ins, 11, 0);
     uint32_t address_base = arm_read_register(p, register_n);
     int err;
-
+    debug("arm_load_store_immediate_offset with ins %x\n", ins);
     if (l_bit == 1)
     { // LDR{B}
         if (p_bit == 1)
@@ -208,8 +208,7 @@ int arm_load_store_immediate_offset(arm_core p, uint32_t ins)
     else
     { // STR{B}
         if (p_bit == 1)
-        { // Pre-indexing or Offset
-            debug("Store pre-indexing or Offset\n");
+        { // Pre-indexing or Offset 
             if (w_bit == 1)
             { // Pre-indexing
                 err = arm_store_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
@@ -255,6 +254,7 @@ int arm_load_store_register_offset(arm_core p, uint32_t ins)
     uint8_t scaled = (uint8_t)shift_imm & (uint8_t)shift & (uint8_t)bit_4;
     int err = 0;
     
+    debug("arm_load_store_register_offset with ins %x\n", ins);
     if (scaled != 0) {
         switch (shift)
         {

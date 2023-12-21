@@ -26,6 +26,7 @@ Contact: Guillaume.Huard@imag.fr
 #include "arm_load_store.h"
 #include "arm_branch_other.h"
 #include "arm_constants.h"
+#include "debug.h"
 #include "util.h"
 
 static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
@@ -43,6 +44,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
     uint8_t b7_4 = get_bits(inst, 7, 4);
     uint8_t b24 = get_bit(inst, 24);
 
+    debug("inst: %x\n", inst);
     switch (instcode)
     {
     case 0x0:
@@ -93,7 +95,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
         {
             if (b21 == 0)
             {
-                // Undefined instruction
+                CODE_ERREUR = UNDEFINED_INSTRUCTION;
             }
             else
             {
@@ -103,6 +105,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
         else
         {
             // Data processing immediate
+            debug("Data processing immediate, ins: %x\n", inst);
             CODE_ERREUR = arm_data_processing_immediate(p, inst, cpsr);
         }
         break;
