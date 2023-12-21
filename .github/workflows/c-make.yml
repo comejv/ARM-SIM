@@ -86,6 +86,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      -nme: Install gdb-multiarch
+        run: sudo apt-get install -y gdb-multiarch
       - name: Download test_ldm_stm
         uses: actions/download-artifact@v2
         with:
