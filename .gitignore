@@ -35,6 +35,7 @@ registers_test
 send_irq
 example*
 insertion_sort
+Examples/test_*[!.s]
 
 # Debug files
 *.dSYM/
