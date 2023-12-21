@@ -235,10 +235,10 @@ int arm_load_store_immediate_offset(arm_core p, uint32_t ins)
 
 int arm_load_store_register_offset(arm_core p, uint32_t ins)
 {
-    // uint8_t p_bit = get_bit(ins, P_SHIFT);
+    uint8_t p_bit = get_bit(ins, P_SHIFT);
     uint8_t u_bit = get_bit(ins, U_SHIFT);
     uint8_t b_bit = get_bit(ins, B_SHIFT);
-    // uint8_t w_bit = get_bit(ins, W_SHIFT);
+    uint8_t w_bit = get_bit(ins, W_SHIFT);
     uint8_t l_bit = get_bit(ins, L_SHIFT);
     uint8_t lpw_bits = l_bit << 2 | p_bit << 1 | w_bit;
 
@@ -523,11 +523,11 @@ int arm_load_store_multiple(arm_core p, uint32_t ins)
             cpsr = arm_read_cpsr(p);
 
             if (get_bit(value, 0) && !get_bit(cpsr, 5)) {
-                set_bit(cpsr, 5);
+                cpsr = set_bit(cpsr, 5);
                 arm_write_cpsr(p, cpsr);
             }
             else if (!get_bit(value, 0) && get_bit(cpsr, 5)) {
-                clr_bit(cpsr, 5);
+                cpsr = clr_bit(cpsr, 5);
                 arm_write_cpsr(p, cpsr);
             }
             address += jump;
