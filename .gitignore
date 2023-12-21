@@ -36,6 +36,7 @@ send_irq
 example*
 **/*test
 insertion_sort
+Examples/test_*[!.s]
 
 # Debug files
 *.dSYM/
@@ -52,7 +53,11 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+<<<<<<< HEAD
 # Swap and history
+=======
+# History
+>>>>>>> main
 *.swp
 .gdb_history
 
