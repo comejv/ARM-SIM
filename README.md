@@ -28,6 +28,7 @@ To use the simulator, you must connect to it a gdb client:
 arm-none-eabi-gdb
 file Examples/foo (for instance)
 target remote localhost:<port number given by the simulator>
+set endian big
 load
 step
 break 8
