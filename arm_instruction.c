@@ -78,7 +78,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
                 // Multiplies; Extra load/stores
                 if (b5 == 0 && b6 == 0)
                 {
-                    CODE_ERREUR = arm_multiply(p, inst);
+                    CODE_ERREUR = arm_multiply(p, inst, cpsr);
                 }
                 else
                 {
