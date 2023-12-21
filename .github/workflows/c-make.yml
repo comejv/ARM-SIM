@@ -86,8 +86,8 @@ jobs:
             exit 1
           fi
   
-  test_ldm_stm:
-    name: Test LDM/STM
+  ARM tests:
+    name: Test all arm files
     needs: build
     runs-on: ubuntu-latest
 
@@ -107,6 +107,8 @@ jobs:
       - name: Run test_ldm_stm and check return code
         run: |
           chmod +x arm_simulator
+          ls -l
+          ls -l Examples
           bash test_feature.bash
           if [ $? -ne 0 ]; then
             echo "Test LDM/STM failed!"
