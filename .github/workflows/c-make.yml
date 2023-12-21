@@ -105,12 +105,10 @@ jobs:
           name: arm_simulator
       - name: Run test_ldm_stm and check return code
         run: |
+          echo "*** Current directory : ***"
+          ls -l
           echo "*** Examples : ***"
           ls -l Examples/
-          echo "*** ldm_stm_test : ***"
-          ls -l ldm_stm_test/
-          echo "*** arm_simulator : ***"
-          ls -l arm_simulator/
           mv ldm_stm_test/test_ldm_stm Examples/
           mv arm_simulator/arm_simulator .
           echo "*** Examples : ***"
