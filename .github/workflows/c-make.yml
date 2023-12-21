@@ -38,6 +38,13 @@ jobs:
           name: test_ldm_stm
           path: Examples/test_ldm_stm
           if-no-files-found: error
+      
+      - name: Archive arm_simulator
+        uses: actions/upload-artifact@v2
+        with:
+          name: arm_simulator
+          path: arm_simulator
+          if-no-files-found: error
 
   memory_test:
     name: Memory test
@@ -92,6 +99,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: test_ldm_stm
+      - name: Download arm_simulator
+        uses: actions/download-artifact@v2
+        with:
+          name: arm_simulator
       - name: Run test_ldm_stm and check return code
         run: |
           bash test_feature.bash
