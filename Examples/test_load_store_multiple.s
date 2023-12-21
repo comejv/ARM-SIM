@@ -64,6 +64,8 @@ main:
     bne fail
 
     // All tests passed
+    
+end:
     mov r0, #0
     swi 0x123456
 
