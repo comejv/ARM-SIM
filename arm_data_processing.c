@@ -440,7 +440,7 @@ int arm_data_processing_immediate(arm_core p, uint32_t ins, uint32_t cpsr)
     uint8_t S = get_bit(ins, 20);
     uint32_t immed_8 = get_bits(ins, 7, 0);
     uint8_t rotate_imm = get_bits(ins, 11, 8);
-    uint32_t shifter_operand = ror(immed_8, rotate_imm);
+    uint32_t shifter_operand = ror(immed_8, rotate_imm * 2);
     uint8_t shifter_carry_out = 0;
     if (rotate_imm == 0)
     {
