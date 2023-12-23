@@ -4,9 +4,9 @@
 
 This project aims to develop a simulator for a subset of the ARMv5 instruction set. The simulator is designed to execute machine code written for the ARMv5 instruction set on a host machine with a different instruction set. While the primary target host architecture is Intel x86 (32-bit) or x86-64 (64-bit), the simulator code is written portably and can be compiled and executed on other architectures.
 
-The project relies on the `gdb` debugger in client-server mode, specifically `arm-none-eabi-gdb`, to extract sections from ELF executable files and load them into the simulator's memory. It also allows for step-by-step execution and interaction with the simulator's memory and registers.
+The project relies on the `gdb` debugger in client-server mode, specifically `gdb-multiarch` or `arm-none-eabi-gdb`, to extract sections from ELF executable files and load them into the simulator's memory. It also allows for step-by-step execution and interaction with the simulator's memory and registers.
 
-The simulator (server) and `arm-none-eabi-gdb` (client) interact via a TCP/IP network communication channel and can thus be launched on the same machine or on different machines.
+The simulator (server) and `gdb` (client) interact via a TCP/IP network communication channel and can thus be launched on the same machine or on different machines.
 
 ## Installation
 
@@ -38,7 +38,7 @@ cont
 
 Debugging messages and traces outputed by the simulator can be chosen at
 compile-time using compilation flags. Just comment the undesired flags settings
-in the first lines of Makefile.am, then make clean && make.
+in the first lines of Makefile.am, then `make clean && make`.
 
 ## Testing
 
@@ -46,12 +46,11 @@ Tests are available for these features :
 - [X] Simulated memory : `./memory_test`
 - [X] Registers : `./registers_test`
 - [X] Memory access : `bash test_features.bash`
-- [ ] Branch and link
+- [X] Branch and link : `bash test_features.bash`
 - [X] Arithmetic instructions : `bash test_features.bash`
 - [X] Inter register instructions : `bash test_features.bash`
-- [ ] Coprocessor instructions
+- [ ] Coprocessor instructions (not implemented)
 
 ## Acknowledgements
 
 This project uses resources available on [ARM's official website](https://www.arm.com) for the ARMv5 reference manual and `arm-none-eabi-gdb` for debugging capabilities.
-
