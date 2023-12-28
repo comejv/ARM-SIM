@@ -43,7 +43,6 @@ int main() {
     for (i = 0; i < 15; i++) {
         word_value[i] = random();
     }
-
     // Arm reset
     printf("Reseting registers...\n");
     registers_write_cpsr(r, 0x1d3);
@@ -62,7 +61,7 @@ int main() {
     printf("Current mode : ");
     if (registers_get_mode(r) != USR) return 1;
     printf("Test passed\n");
-    r->mode = IRQ;
+    registers_write_cpsr(r, IRQ);
     printf("Mode is priviledged : ");
     if (!registers_in_a_privileged_mode(r)) return 1;
     printf("Test passed\n");

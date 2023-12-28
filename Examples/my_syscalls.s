@@ -5,3 +5,4 @@ my_exit:
 my_putchar:
 	swi 0x000001
 	mov pc, lr
+ 

@@ -53,6 +53,12 @@ int arm_exception(arm_core p, uint8_t exception) {
             return 0;
         }
     }
+
+    if (exception == INTERRUPT){
+        uint32_t cpsr_v = arm_read_cpsr(p);
+        if (get_bit(cpsr_v, 7) == 0){
+        }
+    }
     /* Aside from SWI, we only support RESET initially */
     /* Semantics of reset interrupt (ARM manual A2-18) */
     if (exception == RESET) {

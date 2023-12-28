@@ -27,8 +27,9 @@ Contact: Guillaume.Huard@imag.fr
 
 #define N_REGISTRES 18
 #define N_MODES 7
-// Mode 0 = USER; 1 = SYSTEM; 2 = SUPERVISOR;
-// Mode 3 = ABORT; 4 = UNDEFINED; 5 = INTERRUPT; 6 = FAST INTERRUPT
+// Mode 0 = User; 1 = FIQ; 2 = IRQ;
+// Mode 3 = Supervisor; 7 = Abort; 
+// Mode 11 = Undefined ; 15 = System
  
 #define CPSR 16
 #define SPSR 17
@@ -48,7 +49,6 @@ typedef struct
  */
 struct registers_data
 {
-    uint8_t mode;
     register_data *reg;
 };
 

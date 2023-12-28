@@ -337,7 +337,6 @@ void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t
             *shifter_operand = 0;
             *shift_carry_out = 0;
         }
-
         break;
     case LSR: // Logical shift right by immediate (LSR)
         if (Rs_significant_bits == 0)
