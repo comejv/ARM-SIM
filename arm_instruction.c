@@ -134,7 +134,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
         break;
     case 0x4:
         // Load/Store multiple
-        //CODE_ERREUR = arm_load_store_multiple(p, inst);
+        CODE_ERREUR = arm_load_store_multiple(p, inst);
         break;
     case 0x5:
         // Branch and branch with link

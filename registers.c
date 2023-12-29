@@ -64,7 +64,7 @@ registers registers_create()
             r->reg[i].data = (uint32_t *)calloc(5, sizeof(uint32_t));
             for (int j = 2; j < N_MODES; j++)
             {
-                r->reg[i].ptrs[j] = &r->reg[i].data[j];
+                r->reg[i].ptrs[j] = &r->reg[i].data[j - 2];
             }
             break;
         default:
@@ -188,8 +188,7 @@ void registers_write_spsr(registers r, uint8_t mode, uint32_t value)
 {
     if (registers_mode_has_spsr(r, mode))
     {
-        uint8_t m = get_read_write_mode(mode);
-        registers_write(r, SPSR, m, value);
+        registers_write(r, SPSR, mode, value);
     }
     return;
 }

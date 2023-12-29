@@ -79,7 +79,7 @@ int main()
     if (!registers_current_mode_has_spsr(r))
         return 1;
     printf("Test passed\n");
-
+    registers_read_spsr(r, IRQ);
     printf("Test if pointer have the same destination : ");
     if (registers_read(r, 0, USR) != registers_read(r, 0, IRQ))
         return 1;
