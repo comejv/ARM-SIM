@@ -26,7 +26,7 @@ these connections.
 To use the simulator, you must connect to it a gdb client:
 ```gdb
 arm-none-eabi-gdb
-file Examples/foo (for instance)
+file Tests/foo (for instance)
 target remote localhost:<port number given by the simulator>
 set endian big
 load

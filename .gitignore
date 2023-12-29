@@ -38,8 +38,10 @@ send_irq
 example[0-9]*
 **/*test
 insertion_sort
-Examples/test_*[!.s]
-Examples/some_print
+Tests/test_*[!.s]
+Tests/some_print
+Showcase/.*[!.s]
+
 core
 
 # Debug files
@@ -61,7 +63,7 @@ dkms.conf
 *.swp
 .gdb_history
 .nfs*
-Examples/trace/
+Tests/trace/
 
 # Automake files
 **/Makefile

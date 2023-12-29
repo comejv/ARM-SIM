@@ -17,9 +17,9 @@ if [[ ! -x ./arm_simulator ]]; then
 fi
 
 tests=()
-tests+=("Examples/test_ldr_str")
-tests+=("Examples/test_data_processing")
-tests+=("Examples/test_ldm_stm")
+tests+=("Tests/test_ldr_str")
+tests+=("Tests/test_data_processing")
+tests+=("Tests/test_ldm_stm")
 
 for test in "${tests[@]}"; do
     echo -e "\x1b[34mInfo : Running test $test\x1b[0m"
