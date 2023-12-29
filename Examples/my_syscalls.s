@@ -1,7 +1,8 @@
 .global my_exit
 .global my_putchar
-.global my_printint 
-.global acquitter_irq 
+.global my_printint
+.global acquitter_irq
+
 my_exit:
     swi 0x123456
 my_putchar:
@@ -9,7 +10,7 @@ my_putchar:
     mov pc, lr
 my_printint:
     swi 0x000002
-    mov pc, lr    
+    mov pc, lr
 acquitter_irq:
-	swi 0xFFFFFF
-	mov pc, lr 
+    swi 0xFFFFFF
+    mov pc, lr
