@@ -30,7 +30,6 @@ registers registers_create()
 
     registers r = NULL;
     r = (registers)malloc(sizeof(struct registers_data));
-    r->mode = USR;
     r->reg = (register_data *)malloc(sizeof(register_data) * N_REGISTRES);
     for (int i = 0; i < N_REGISTRES; i++)
     {
@@ -129,7 +128,7 @@ uint8_t get_read_write_mode(uint8_t mode)
 
 uint8_t registers_get_mode(registers r)
 {
-    return r->mode;
+    return get_bits(r->reg[CPSR].data[0], 5, 0);
 }
 
 static int registers_mode_has_spsr(registers r, uint8_t mode)
@@ -160,7 +159,7 @@ uint32_t registers_read(registers r, uint8_t reg, uint8_t mode)
 
 uint32_t registers_read_cpsr(registers r)
 {
-    return registers_read(r, CPSR, r->mode);
+    return r->reg[CPSR].data[0];
 }
 
 uint32_t registers_read_spsr(registers r, uint8_t mode)
@@ -181,7 +180,7 @@ void registers_write(registers r, uint8_t reg, uint8_t mode, uint32_t value)
 
 void registers_write_cpsr(registers r, uint32_t value)
 {
-    registers_write(r, CPSR, 0, value);
+    r->reg[CPSR].data[0] = value;
     return;
 }
 

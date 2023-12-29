@@ -48,7 +48,6 @@ typedef struct
  */
 struct registers_data
 {
-    uint8_t mode;
     register_data *reg;
 };
 
