@@ -1,22 +1,20 @@
 #include "my_syscalls.h"
 
-void reception_IRQ(){
+void message()
+{
     my_putchar('I');
-    my_putchar('R');
-    my_putchar('Q');
     my_putchar('\n');
 }
 
 __attribute__((section(".irq_vector"))) void irq_handler(void)
 {
-    reception_IRQ();
-} 
-
-
+    message();
+    acquitter_irq();
+}
 
 int main()
 {
-    while (1)
+    for (int i = 0; i < 100000; i++)
     {
     }
     return 0;

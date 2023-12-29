@@ -67,7 +67,8 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
             {
                 if (opcode2b == 2 && S == 0)
                 {
-                    // Misceallaneous instruction (2)
+
+                    CODE_ERREUR = arm_miscellaneous_2(p, inst, cpsr);
                 }
                 else
                 {
@@ -106,6 +107,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
         {
             // Data processing immediate
             debug("Data processing immediate, ins: %x\n", inst);
+    case 0x3:
             CODE_ERREUR = arm_data_processing_immediate(p, inst, cpsr);
         }
         break;
@@ -113,7 +115,6 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
         // Load/Store immediate offset
         CODE_ERREUR = arm_load_store_immediate_offset(p, inst);
         break;
-    case 0x3:
         if (b4 == 0)
         {
             // Load/Store register offset
@@ -221,6 +222,7 @@ static int arm_execute_instruction(arm_core p)
             return 0;
         }
     }
+
     return 1;
 }
 
@@ -228,7 +230,6 @@ static int arm_execute_instruction(arm_core p)
 int arm_step(arm_core p)
 {
     int result;
-
     result = arm_execute_instruction(p);
     if (result)
     {
