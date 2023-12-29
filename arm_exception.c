@@ -56,33 +56,33 @@ int arm_exception(arm_core p, uint8_t exception)
             return 0;
         case 0x000002:
             value = arm_read_register(p, 0);
-            printf("%d",value);
+            printf("%d", value);
             return 0;
         case 0xFFFFFF:
             printf("IRQ finie !\n");
-            return 0; 
+            return 0;
         }
     }
     if (exception == INTERRUPT)
     {
         uint32_t cpsr = arm_read_cpsr(p);
-        printf("CHELOU %x\n", cpsr);
-        if (get_bit(cpsr, 7) >= 0) // TO DO 
+        printf("FIX this %x\n", cpsr);
+        if (get_bit(cpsr, 7) >= 0) // TO DO
         {
             printf("DEBUT IRQ !\n");
-            uint32_t R14_irq = arm_read_register(p, 15) - 8;
+            uint32_t R14_irq = arm_read_register(p, PC);
             uint32_t SPSR_irq = cpsr;
-            cpsr = set_bits(cpsr, 4, 0, IRQ);
+            cpsr = set_bits(cpsr, 5, 0, IRQ);
             cpsr = clr_bit(cpsr, 5);
             cpsr = set_bit(cpsr, 7); // Disable IRQ
             arm_write_cpsr(p, cpsr);
-            printf("Mode : %d CPSR value : %x\n",arm_current_mode_has_spsr(p), cpsr);
-            arm_write_register(p, LR, R14_irq);
             arm_write_spsr(p, SPSR_irq);
-            arm_write_register(p, PC, IRQ_vector_ADR);
+            arm_write_register(p, LR, R14_irq);
+            arm_write_register(p, SP, 0x8000);
+            printf("LR value : %x\n",R14_irq);
+            arm_write_register(p, PC, IRQ_vector_ADR - 4);
         }
-    return 0;
-
+        return 0;
     }
     /* Aside from SWI, we only support RESET initially */
     /* Semantics of reset interrupt (ARM manual A2-18) */

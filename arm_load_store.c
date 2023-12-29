@@ -208,7 +208,7 @@ int arm_load_store_immediate_offset(arm_core p, uint32_t ins)
     else
     { // STR{B}
         if (p_bit == 1)
-        { // Pre-indexing or Offset 
+        { // Pre-indexing or Offset
             if (w_bit == 1)
             { // Pre-indexing
                 err = arm_store_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
@@ -253,9 +253,10 @@ int arm_load_store_register_offset(arm_core p, uint32_t ins)
 
     uint8_t scaled = (uint8_t)shift_imm & (uint8_t)shift & (uint8_t)bit_4;
     int err = 0;
-    
+
     debug("arm_load_store_register_offset with ins %x\n", ins);
-    if (scaled != 0) {
+    if (scaled != 0)
+    {
         switch (shift)
         {
         case LSL:
@@ -265,69 +266,73 @@ int arm_load_store_register_offset(arm_core p, uint32_t ins)
         case LSR:
             if (shift_imm == 0)
                 offset = 0;
-            else 
+            else
                 offset = register_m >> shift_imm;
             break;
 
         case ASR:
-            if (shift_imm == 0) {
+            if (shift_imm == 0)
+            {
                 if (get_bit(arm_read_register(p, register_m), 31) == 1)
                     offset = 0xFFFFFFFF;
-                else 
+                else
                     offset = 0;
-            } else {
+            }
+            else
+            {
                 offset = (int)register_m >> shift_imm;
-            } 
+            }
             break;
 
         case ROR:
-            if (shift_imm == 0) 
+            if (shift_imm == 0)
                 offset = (get_bit(arm_read_cpsr(p), C) << 31) | register_m >> 1;
-            else 
-                offset = ror(register_m, shift_imm); 
+            else
+                offset = ror(register_m, shift_imm);
             break;
-        
+
         default:
             // It should not exist
             break;
         }
     }
 
-    switch (lpw_bits) {
-        case 0b000: // L 0 -> Store // P 0 -> Postindexing // Wdoit etre a 0
-            err = arm_store_immediate_postindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
-            break;
-        case 0b001: // W - 1
-            err = UNDEFINED_INSTRUCTION;
-            break;
-        case 0b010: // P - 1 W - 0 => Register Offset
-            err = arm_store_immediate_offset(p, l_bit, u_bit, b_bit, register_d, &address_base, offset);
-            break;
-        case 0b011: // P - 1 W - 1 => Register Pre-indexing
-            err = arm_store_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
-            break;
-        case 0b100: // L 1 -> Load // P 0 -> Post indexing
-            err = arm_load_immediate_postindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
-            break;
-        case 0b101:
-            err = UNDEFINED_INSTRUCTION;
-            break;
-        case 0b110:
-            err = arm_load_immediate_offset(p, l_bit, u_bit, b_bit, register_d, &address_base, offset);
-            break;
-        case 0b111:
-            err = arm_load_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
-            break;
-        default:
-            err = UNDEFINED_INSTRUCTION;
-            break;
+    switch (lpw_bits)
+    {
+    case 0b000: // L 0 -> Store // P 0 -> Postindexing // Wdoit etre a 0
+        err = arm_store_immediate_postindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+        break;
+    case 0b001: // W - 1
+        err = UNDEFINED_INSTRUCTION;
+        break;
+    case 0b010: // P - 1 W - 0 => Register Offset
+        err = arm_store_immediate_offset(p, l_bit, u_bit, b_bit, register_d, &address_base, offset);
+        break;
+    case 0b011: // P - 1 W - 1 => Register Pre-indexing
+        err = arm_store_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+        break;
+    case 0b100: // L 1 -> Load // P 0 -> Post indexing
+        err = arm_load_immediate_postindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+        break;
+    case 0b101:
+        err = UNDEFINED_INSTRUCTION;
+        break;
+    case 0b110:
+        err = arm_load_immediate_offset(p, l_bit, u_bit, b_bit, register_d, &address_base, offset);
+        break;
+    case 0b111:
+        err = arm_load_immediate_preindexing(p, l_bit, u_bit, b_bit, register_n, register_d, &address_base, offset);
+        break;
+    default:
+        err = UNDEFINED_INSTRUCTION;
+        break;
     }
 
     return err;
 }
 
 int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
-{   
+{
     debug("arm_load_store_miscellaneous with ins %x\n", ins);
     // Get parameters
     uint8_t p_bit = get_bit(ins, P_SHIFT);
@@ -471,107 +476,88 @@ int arm_load_store_miscellaneous(arm_core p, uint32_t ins)
 
 int arm_load_store_multiple(arm_core p, uint32_t ins)
 {
-    uint32_t cpsr = 0;
-    uint32_t value = 0;
-    uint32_t address = 0;
-    int8_t jump = 0;
-    uint8_t number_of_set_bits = 0;
-    int err = 0;
+    uint8_t P = get_bit(ins, 24);
+    uint8_t U = get_bit(ins, 23);
+    uint8_t S = get_bit(ins, 22);
+    uint8_t W = get_bit(ins, 21);
+    uint8_t L = get_bit(ins, 20);
+    uint8_t Rn = get_bits(ins, 19, 16);
+    uint16_t register_list = get_bits(ins, 15, 0);
+    uint32_t Rn_v = arm_read_register(p, Rn);
+    uint32_t number_of_set_bits = 0;
+    uint32_t address, end_address, data, W_adress;
+    for (int i = 0; i < 16; i++)
+    {
+        number_of_set_bits += get_bit(register_list, i); // Fix the function call
+    }
 
-    if (number_of_set_bits == 0) {
-        return UNDEFINED_INSTRUCTION;
+    if (!P && U)
+    {
+        address = Rn_v;
+        end_address = Rn_v + (number_of_set_bits * 4) - 4;
+        W_adress = Rn_v + (number_of_set_bits * 4);
     }
-    // L == 1: LDM(1)
-    if (get_bit(ins, 20)) { 
-        // U == 1: increment
-        if (get_bit(ins, 23)) { 
-            address = arm_read_register(p, get_bits(ins, 19, 16));
-            jump = 4;
-        }
-        // U == 0: decrement
-        else { 
-            // getting the number of set bits in the register list
-            for (int i = 0; i < 16; i++) {
-                if (get_bit(ins, i)) {
-                    number_of_set_bits++;
-                }
-            }
-            address = arm_read_register(p, get_bits(ins, 19, 16)) + 4 * number_of_set_bits;
-            jump = -4;
-        }
-        // P == 1: pre-indexing
-        if (get_bit(ins, 24)) { 
-            address += jump;
-        }
-        // Les load de r0 a r14
-        for (int i = 0; i < 15; i++) {
-            if (get_bit(ins, i)) {
-                err = arm_read_word(p, address, &value);
-                if (err) {
-                    return err;
-                }
-                arm_write_register(p, i, value);
-                address += jump;
-            }           
-        }    
-        // Si load de PC
-        if (get_bit(ins, 15)) {
-            err = arm_read_word(p, address, &value);
-            if (err) {
-                return err;
-            }
-            cpsr = arm_read_cpsr(p);
+    else if (P && U)
+    {
+        address = Rn_v + 4;
+        end_address = Rn_v + (number_of_set_bits * 4);
+        W_adress = Rn_v + (number_of_set_bits * 4);
+    }
+    else if (!P && !U)
+    {
+        address = Rn_v - ((number_of_set_bits * 4) + 4);
+        end_address = Rn_v;
+        W_adress = Rn_v - (number_of_set_bits * 4);
+    }
+    else // P && !U
+    {
+        address = Rn_v - (number_of_set_bits * 4);
+        end_address = Rn_v - 4;
+        W_adress = Rn_v - (number_of_set_bits * 4);
+    }
+    debug("Operation from %x to %x\n", address, end_address);
 
-            if (get_bit(value, 0) && !get_bit(cpsr, 5)) {
-                cpsr = set_bit(cpsr, 5);
-                arm_write_cpsr(p, cpsr);
+    for (int i = 0; i < 16; i++)
+    {
+        if (get_bit(register_list, i))
+        {
+            if (P == 0)
+            {
+                address += 4;
             }
-            else if (!get_bit(value, 0) && get_bit(cpsr, 5)) {
-                cpsr = clr_bit(cpsr, 5);
-                arm_write_cpsr(p, cpsr);
-            }
-            address += jump;
-        }
-        // W == 1: write back
-        if (get_bit(ins, 21)) { 
-            arm_write_register(p, get_bits(ins, 19, 16), address - jump);
-        }
-    }
-    // L ==0: STM (1)
-    else { 
-        // U == 1: increment
-        if (get_bit(ins, 23)) { 
-            address = arm_read_register(p, get_bits(ins, 19, 16));
-            jump = 4;
-        }
-        // U == 0: decrement
-        else {
-            // getting the number of set bits in the register list
-            for (int i = 0; i < 16; i++) {
-                if (get_bit(ins, i)) {
-                    number_of_set_bits++;
+            if (L)
+            {
+                arm_read_word(p, address, &data);
+                if (i == 15)
+                {
+                    data = data & 0xFFFFFFFC;
                 }
+                debug("LOAD %x from %x in R%d\n", data, address, i);
+                arm_write_register(p, i, data);
             }
-            address = arm_read_register(p, get_bits(ins, 19, 16)) + 4 * number_of_set_bits;
-            jump = -4;
-        }
-        // P == 1: pre-indexing
-        if (get_bit(ins, 24)) { 
-            address += jump;
-        }
-        for (int i = 0; i < 16; i++) {
-            if (get_bit(ins, i)) {
-                value = arm_read_register(p, i);
-                arm_write_word(p, address, value);
-                address += jump;
-            }           
-        }
-        // W == 1: write back
-        if (get_bit(ins, 21)) { 
-            arm_write_register(p, get_bits(ins, 19, 16), address - jump);
+            else
+            {
+                uint32_t data = arm_read_register(p, i);
+                debug("STORE %x at %x in R%d\n", data, address, i);
+                arm_write_word(p, address, data);
+            }
+
+            if (P == 1)
+            {
+                address += 4;
+            }
         }
     }
-    return err;
+    if (L && S && get_bit(ins, 15)) // Check if PC has been changed 
+    {
+        arm_write_cpsr(p, arm_read_spsr(p));
+    }
+    if (W == 1)
+    {
+        debug("New R%d value : %x\n", Rn, W_adress);
+        arm_write_register(p, Rn, W_adress);
+    }
+    return 0;
 }
 
 int arm_coprocessor_load_store(arm_core p, uint32_t ins)
