@@ -12,9 +12,9 @@ AM_CFLAGS+=-D BIG_ENDIAN_SIMULATOR
 LDADD=-lpthread
 
 if HAVE_ARM_COMPILER
-SUBDIRS=. Examples
+SUBDIRS=. Tests Showcase
 endif
-
+ 
 bin_PROGRAMS=arm_simulator send_irq memory_test registers_test
 
 COMMON=csapp.h csapp.c scanner.h scanner.l debug.h debug.c \
