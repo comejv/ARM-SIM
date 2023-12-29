@@ -67,7 +67,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
             {
                 if (opcode2b == 2 && S == 0)
                 {
-                    // Misceallaneous instruction (2)
+                    CODE_ERREUR = arm_miscellaneous_2(p, inst, cpsr);
                 }
                 else
                 {

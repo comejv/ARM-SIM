@@ -29,6 +29,8 @@
 *.dylib
 
 # Executables
+clock
+fibonacci
 arm_simulator
 memory_test
 registers_test
