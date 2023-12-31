@@ -6,26 +6,43 @@ void clock(int n)
     {
     }
 }
+int longueur(char *str)
+{
+    int i = 0;
+    while (str[i] != '\0')
+    {
+        i++;
+    }
+    return i;
+}
 
 int main()
 {
-    char text[] = "Chenillion";
-    int len = sizeof(text) - 1;
-
-    while (1)
+    char *text = "PROCHAIN ARRET : PONTCHARRA SUR BREDA.";
+    int len = 39; // longueur(text);
+    int len_affiche = 20;
+    int i, j,x;
+    char temp[len_affiche];
+    my_printstr(text);
+    my_putchar('\n');
+    for (int g = 0; g < 2; g++)
     {
-        for (int i = 0; i < len; i++)
+        for (i = 0; i < len; i++)
         {
-            my_putchar(text[i]);
-            // Forcer l'affichage
-            clock(100000);
-        }
-        for (int i = len - 1; i >= 0; i--)
-        {
-            my_putchar('\b');
-            my_putchar('\b'); // Effacer le dernier caractère
+            for (j = 0; j < len_affiche; j++)
+            {
+                x = (i + j);
+                while (x >= len)
+                {
+                    x = x - len;
+                }
+                temp[j] = text[x];
+            }
+            my_printstr(temp);
+            clock(50000);
+            my_putchar('\n'); // Retour au début de la ligne
+            
         }
     }
-
-    return 0;
+    my_exit();
 }
