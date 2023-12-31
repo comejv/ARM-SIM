@@ -77,6 +77,7 @@ int arm_exception(arm_core p, uint8_t exception)
         case 0x000002:
             value = arm_read_register(p, 0);
             printf("%d", value);
+             fflush(stdout);
             return 0;
         case 0x000003:
             print_string(p);
