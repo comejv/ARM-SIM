@@ -35,8 +35,8 @@ void print_string(arm_core p)
 
     uint32_t address = arm_read_register(p, 0);
     uint8_t value;
-    char c[100]; // = (char *)malloc(sizeof(char));
-    int i = 0;
+    uint32_t i = 0;
+    char c[100];
     do
     {
         arm_read_byte(p, address, &value);
