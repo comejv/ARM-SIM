@@ -17,7 +17,7 @@ int longueur(char *text)
 }
 int division_reste(int a, int b)
 {
-    while (a >= b)
+    while (a > b-1)
     {
         a = a - b;
     }
@@ -32,21 +32,31 @@ int main()
     int len_affiche = 20;
     int i, j, x;
     //char temp[len_affiche];
-    //temp[len_affiche] = '\0';
     while(1)
     {
         for (i = 0; i < len; i++)
         {
             for (j = 0; j < len_affiche; j++)
             {
-                x = division_reste(i + j, len);
-              //  temp[j] = text[x];
+                x = division_reste(i + j, len-1);
+                //temp[j] = text[x];
+                // my_printint(i + j);
+                // my_printint(x);
+                //my_putchar('\n');
+                my_printint(i);
+                my_putchar('+');
+                my_printint(j);
+                my_putchar('/');
+                my_printint(len - 1);
+                my_putchar('=');
                 my_printint(x);
+                my_putchar(' ');
+                
                 my_putchar('\n');
             }
             //temp[len_affiche] = '\0';
-            
-            //my_printstr(temp);
+    
+            // my_printstr(temp);
             clock(50000);
             my_putchar('\n'); // Retour au début de la ligne
         }

@@ -1,12 +1,11 @@
 #include "stdio.h"
-#include "unistd.h"
 
-// void clock(int n)
-// {
-//     for (int i = 0; i < n; i++)
-//     {
-//     }
-// }
+void clock(int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+    }
+}
 int longueur(char *text)
 {
     int i = 0;
@@ -14,7 +13,7 @@ int longueur(char *text)
     {
         i++;
     }
-    return i;
+    return i + 1;
 }
 int division_reste(int a, int b)
 {
@@ -24,25 +23,33 @@ int division_reste(int a, int b)
     }
     return a;
 }
+
 int main()
 {
-    char *text = "PROCHAIN ARRET : PONTCHARRA SUR BREDA ";
-    int len = longueur(text) + 1;
+    char *text = "PROCHAIN ARRET : PONTCHARRA SUR BREDA. "; //
+    int len = longueur(text);
     int len_affiche = 20;
     int i, j, x;
     char temp[len_affiche];
-    for (int g = 0; g < 2; g++)
+    while (1)
     {
         for (i = 0; i < len; i++)
         {
-            for (j = 0; j <= len_affiche; j++)
+            for (j = 0; j < len_affiche; j++)
             {
                 x = division_reste(i + j, len - 1);
                 temp[j] = text[x];
+                // my_printint(i + j);
+                // my_printint(x);
+                // my_putchar('\n');
+                printf("%d %d %d\n", i, j, x);
             }
-            printf("%s", temp);
-            usleep(50000);
-            printf("\n"); // Retour au début de la ligne
+            
+            temp[len_affiche] = '\0';
+
+            //printf("%s\n",temp);
+            clock(50000);
+
         }
     }
     return 0;
