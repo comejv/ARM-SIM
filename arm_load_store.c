@@ -490,7 +490,6 @@ int arm_load_store_multiple(arm_core p, uint32_t ins)
     {
         number_of_set_bits += get_bit(register_list, i); // Fix the function call
     }
-
     if (!P && U)
     {
         debug("Increment After\n");
@@ -508,7 +507,7 @@ int arm_load_store_multiple(arm_core p, uint32_t ins)
     else if (!P && !U)
     {
         debug("Decrement After\n");
-        address = Rn_v - ((number_of_set_bits * 4) + 4);
+        address = Rn_v - (number_of_set_bits * 4) + 4;
         end_address = Rn_v;
         W_adress = Rn_v - (number_of_set_bits * 4);
     }
@@ -525,10 +524,6 @@ int arm_load_store_multiple(arm_core p, uint32_t ins)
     {
         if (get_bit(register_list, i))
         {
-            if (P == 0)
-            {
-                address += 4;
-            }
             if (L)
             {
                 arm_read_word(p, address, &data);
@@ -545,11 +540,7 @@ int arm_load_store_multiple(arm_core p, uint32_t ins)
                 debug("STORE %x at %x in R%d with P = %d\n", data, address, i, P);
                 arm_write_word(p, address, data);
             }
-
-            if (P == 1)
-            {
-                address += 4;
-            }
+            address += 4;
         }
     }
     if (L && S && get_bit(ins, 15)) // Check if PC has been changed 
