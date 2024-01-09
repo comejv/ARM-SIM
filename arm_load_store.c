@@ -493,24 +493,28 @@ int arm_load_store_multiple(arm_core p, uint32_t ins)
 
     if (!P && U)
     {
+        debug("Increment After\n");
         address = Rn_v;
         end_address = Rn_v + (number_of_set_bits * 4) - 4;
         W_adress = Rn_v + (number_of_set_bits * 4);
     }
     else if (P && U)
     {
+        debug("Increment Before\n");
         address = Rn_v + 4;
         end_address = Rn_v + (number_of_set_bits * 4);
         W_adress = Rn_v + (number_of_set_bits * 4);
     }
     else if (!P && !U)
     {
+        debug("Decrement After\n");
         address = Rn_v - ((number_of_set_bits * 4) + 4);
         end_address = Rn_v;
         W_adress = Rn_v - (number_of_set_bits * 4);
     }
     else // P && !U
     {
+        debug("Decrement Before\n");
         address = Rn_v - (number_of_set_bits * 4);
         end_address = Rn_v - 4;
         W_adress = Rn_v - (number_of_set_bits * 4);
@@ -532,13 +536,13 @@ int arm_load_store_multiple(arm_core p, uint32_t ins)
                 {
                     data = data & 0xFFFFFFFC;
                 }
-                debug("LOAD %x from %x in R%d\n", data, address, i);
+                debug("LOAD %x from %x in R%d with P = %d\n", data, address, i, P);
                 arm_write_register(p, i, data);
             }
             else
             {
                 uint32_t data = arm_read_register(p, i);
-                debug("STORE %x at %x in R%d\n", data, address, i);
+                debug("STORE %x at %x in R%d with P = %d\n", data, address, i, P);
                 arm_write_word(p, address, data);
             }
 
