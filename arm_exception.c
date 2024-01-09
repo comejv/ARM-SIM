@@ -29,6 +29,25 @@ Contact: Guillaume.Huard@imag.fr
 #define CP15_reg1_EEbit 0
 #define Exception_bit_9 (CP15_reg1_EEbit << 9)
 #define IRQ_vector_ADR 0x18
+
+void print_string(arm_core p)
+{
+
+    uint32_t address = arm_read_register(p, 0);
+    uint8_t value;
+    uint32_t i = 0;
+    char c[100];
+    do
+    {
+        arm_read_byte(p, address, &value);
+        c[i] = (char)value;
+        i++;
+        address += 1;
+    } while (value != 0);
+    printf("%s", c);
+    fflush(stdout);
+}
+
 int arm_exception(arm_core p, uint8_t exception)
 {
     uint32_t reset_cpsr = 0x1d3 | Exception_bit_9;
@@ -52,14 +71,22 @@ int arm_exception(arm_core p, uint8_t exception)
             return END_SIMULATION;
         case 0x000001:
             value = arm_read_register(p, 0);
-            putchar(value);
+            putchar((char)value);
+            fflush(stdout);
             return 0;
         case 0x000002:
             value = arm_read_register(p, 0);
             printf("%d", value);
+             fflush(stdout);
+            return 0;
+        case 0x000003:
+            print_string(p);
             return 0;
         case 0xFFFFFF:
             printf("IRQ finie !\n");
+            return 0;
+        default:
+            printf("Unknown software interrupt %x\n", instruction);
             return 0;
         }
     }

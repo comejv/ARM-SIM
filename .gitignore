@@ -31,6 +31,7 @@
 # Executables
 clock
 fibonacci
+chenillion
 arm_simulator
 memory_test
 registers_test
