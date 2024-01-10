@@ -48,6 +48,12 @@ void print_string(arm_core p)
     printf("%s", c);
     fflush(stdout);
 }
+int scanint(arm_core p)
+{
+    int x;
+    scanf("%d", &x);
+    return x;
+}
 
 int arm_exception(arm_core p, uint8_t exception)
 {
@@ -66,6 +72,7 @@ int arm_exception(arm_core p, uint8_t exception)
         uint32_t instruction;
         arm_read_word(p, address, &instruction);
         instruction &= 0xFFFFFF;
+        
         switch (instruction)
         {
         case 0x123456:
@@ -82,6 +89,9 @@ int arm_exception(arm_core p, uint8_t exception)
             return 0;
         case 0x000003:
             print_string(p);
+            return 0;
+        case 0x000004:
+            arm_write_register(p,0,scanint(p));
             return 0;
         case 0xFFFFFF:
             debug("IRQ finie !\n");
