@@ -15,14 +15,15 @@ AM_LDFLAGS=-nostdlib -T $(srcdir)/linker_script -n --entry main
 AM_LDFLAGS+=-Wl,-EB
 
 if HAVE_ARM_COMPILER
-noinst_PROGRAMS=insertion_sort fibonacci clock chenillion 
+noinst_PROGRAMS=insertion_sort fibonacci clock chenillion chenillion_rainbow
 
 all-am: $(PROGS)
 endif
 clock_SOURCES=clock.c my_syscalls.s my_syscalls.h
 fibonacci_SOURCES=fibonacci.c my_syscalls.s my_syscalls.h
 insertion_sort_SOURCES=insertion_sort.c my_syscalls.s my_syscalls.h
-chenillion_SOURCES=chenillion.c my_syscalls.s my_syscalls.h
+chenillion_SOURCES=chenillion.c my_syscalls.s my_syscalls.h my_utils.c my_utils.h
+chenillion_rainbow_SOURCES = chenillion_rainbow.c my_syscalls.s my_syscalls.h my_utils.c my_utils.h
 
 EXTRA_DIST=linker_script
 
