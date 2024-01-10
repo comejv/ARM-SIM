@@ -243,7 +243,7 @@ arm_load_store_register_offset(arm_core p, uint32_t ins) {
 
     debug("shift imm : %x\nshift = %x\n", shift_imm, shift);
 
-    uint8_t scaled = (uint8_t) shift_imm & (uint8_t) shift;
+    uint8_t scaled = (uint8_t) shift_imm | (uint8_t) shift;
     int err = 0;
 
     debug("arm_load_store_register_offset with ins %x\n", ins);
