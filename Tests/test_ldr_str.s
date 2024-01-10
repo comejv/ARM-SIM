@@ -367,6 +367,7 @@ end:
 
 fail:
     // Some test failed
+    mov r0, #8
     swi #0x123456
     bx lr
 

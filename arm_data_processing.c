@@ -261,7 +261,6 @@ void get_shifter_operand_immediate_shift(arm_core p, uint8_t shift_imm, uint8_t 
         {
             *shifter_operand = Rm_value;
             *shift_carry_out = get_bit(cpsr, C);
-            ;
         }
         else
         {

@@ -1,10 +1,9 @@
 #include "my_syscalls.h"
 
-void clock(int n)
-{
-    for (int i = 0; i < n; i++)
-    {
-    }
+void clock(int n){
+  for (int i = 0; i < n; i++){
+    
+  }
 }
 int longueur(char *text)
 {
@@ -15,6 +14,7 @@ int longueur(char *text)
     }
     return i+1;
 }
+
 int division_reste(int a, int b)
 {
     while (a > b-1)
@@ -26,12 +26,11 @@ int division_reste(int a, int b)
 
 int main()
 {
-    char *text = "PROCHAIN ARRET : PONTCHARRA SUR BREDA. "; //
+    char *text = "SE DEMANDE SI ELEVER DES CHEVRES EN ARDECHES EST UNE BONNE SITUATION. "; //
     int len = longueur(text);
-    my_printint(len);
-    int len_affiche = 20;
+    int len_affiche = 30;
     int i, j, x;
-    //char temp[len_affiche];
+    char temp[len_affiche];
     while(1)
     {
         for (i = 0; i < len; i++)
@@ -39,26 +38,12 @@ int main()
             for (j = 0; j < len_affiche; j++)
             {
                 x = division_reste(i + j, len-1);
-                //temp[j] = text[x];
-                // my_printint(i + j);
-                // my_printint(x);
-                //my_putchar('\n');
-                my_printint(i);
-                my_putchar('+');
-                my_printint(j);
-                my_putchar('/');
-                my_printint(len - 1);
-                my_putchar('=');
-                my_printint(x);
-                my_putchar(' ');
-                
-                my_putchar('\n');
+                temp[j] = text[x];
             }
-            //temp[len_affiche] = '\0';
     
-            // my_printstr(temp);
+            my_printstr(temp);
+            my_putchar('\r'); // Retour au début de la ligne
             clock(50000);
-            my_putchar('\n'); // Retour au début de la ligne
         }
     }
     my_exit();

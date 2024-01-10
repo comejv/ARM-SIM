@@ -182,6 +182,7 @@ static int arm_execute_instruction(arm_core p)
         uint8_t cpsr_N = get_bit(cpsr, N);
         uint8_t cpsr_C = get_bit(cpsr, C);
         uint8_t cpsr_V = get_bit(cpsr, V);
+        debug("ZNCV : %d %d %d %d\n", cpsr_Z, cpsr_N, cpsr_C, cpsr_V);
         if (cond_inst == EQ && cpsr_Z == 1)
             FLAG_COND = 1;
         else if (cond_inst == NE && cpsr_Z == 0)

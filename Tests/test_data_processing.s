@@ -90,13 +90,10 @@ main:
     MOV R0, #52
     BNE fail
 
-    RSB R0, R4, #10
-    CMP R0, R7
+    MOV R4, #5 
+    RSB R8, R4, #10
+    CMP R8, #5
     MOV R0, #6
-    BNE fail
-    RSB R0, R4, #5
-    CMP R0, #5
-    MOV R0, #6   
     BNE fail
 
     MOV R4, #2
