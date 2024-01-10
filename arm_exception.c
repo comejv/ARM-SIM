@@ -20,6 +20,7 @@ Contact: Guillaume.Huard@imag.fr
      700 avenue centrale, domaine universitaire
      38401 Saint Martin d'H�res
 */
+#include "debug.h"
 #include "arm_exception.h"
 #include "arm_constants.h"
 #include "arm_core.h"
@@ -77,13 +78,18 @@ int arm_exception(arm_core p, uint8_t exception)
         case 0x000002:
             value = arm_read_register(p, 0);
             printf("%d", value);
-             fflush(stdout);
+            fflush(stdout);
             return 0;
         case 0x000003:
             print_string(p);
             return 0;
         case 0xFFFFFF:
-            printf("IRQ finie !\n");
+            debug("IRQ finie !\n");
+            uint32_t SPSR_irq = arm_read_spsr(p);
+            uint32_t R14_irq = arm_read_register(p, LR);
+            arm_write_cpsr(p, SPSR_irq);
+            arm_write_register(p, PC, R14_irq);
+            debug("Retour de la PC à %x", R14_irq);
             return 0;
         default:
             printf("Unknown software interrupt %x\n", instruction);
@@ -93,20 +99,19 @@ int arm_exception(arm_core p, uint8_t exception)
     if (exception == INTERRUPT)
     {
         uint32_t cpsr = arm_read_cpsr(p);
-        printf("FIX this %x\n", cpsr);
+        debug("FIX this %x\n", cpsr);
         if (get_bit(cpsr, 7) >= 0) // TO DO
         {
-            printf("DEBUT IRQ !\n");
-            uint32_t R14_irq = arm_read_register(p, PC);
+            debug("DEBUT IRQ !\n");
+            uint32_t R14_irq = arm_read_register(p, PC) - 4;
             uint32_t SPSR_irq = cpsr;
             cpsr = set_bits(cpsr, 5, 0, IRQ);
             cpsr = clr_bit(cpsr, 5);
-            cpsr = set_bit(cpsr, 7); // Disable IRQ
+            // cpsr = set_bit(cpsr, 7); // Disable IRQ
             arm_write_cpsr(p, cpsr);
             arm_write_spsr(p, SPSR_irq);
             arm_write_register(p, LR, R14_irq);
-            arm_write_register(p, SP, 0x8000);
-            printf("LR value : %x\n",R14_irq);
+            debug("LR value : %x\n", R14_irq);
             arm_write_register(p, PC, IRQ_vector_ADR - 4);
         }
         return 0;

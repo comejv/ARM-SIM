@@ -1,237 +1,200 @@
-@ Tests instruction simple
-@
-@ eq	    Z==1
-@ ne	    Z==0
-@ cs or hs	C==1
-@ cc or lo	C==0
-@ mi	    N==1
-@ pl	    N==0
-@ vs	    V==1
-@ vc	    V==0
-@ hi	    (C==1) && (Z==0)
-@ ls	    (C==0) || (Z==1)
-@ ge	    N==V
-@ lt	    N!=V
-@ gt	    (Z==0) && (N==V)
-@ le	    (Z==1) || (N!=V)
-@
-@ Résultats attendus par registre à la fin de ce test:
-@ R0 = 0
-@ Si R0 n'est pas égal à 0, cela signifie qu'il y a eu une erreur:
-@ R0 = 1 : MOV
-@ R0 = 2 : MVN
-@ R0 = 3 : AND
-@ R0 = 4 : EOR
-@ R0 = 5 : SUB
-@ R0 = 6 : RSB
-@ R0 = 7 : ADD
-@ R0 = 8 : ADC
-@ R0 = 9 : SBC
-@ R0 = 10: RSC
-@ R0 = 11: ORR
-@ R0 = 12: BIC
-@
-@ R0 = 20: MOV LSL imm
-@ R0 = 21: MOV LSR imm
-@ R0 = 22: MOV ASR imm
-@ R0 = 23: MOV ROR imm
-@ R0 = 24: MOV LSL reg
-@ R0 = 25: MOV LSR reg
-@ R0 = 26: MOV ASR reg
-@ R0 = 27: MOV ROR reg
-@
-@ R0 = 30: ADDS set C
-@ R0 = 31: ADDS set V
-@ R0 = 32: ANDS set C
-@ R0 = 33: EORS set C
-@ R0 = 34: SUBS set C
-@ R0 = 35: SUBS set V
-@ R0 = 36: RSBS set C
-@ R0 = 37: RSBS set V
-
 .global main
 
 .text
 
 main:
+    ldr r3, =#0x0
+    ldr r4, =#0xA
+    ldr r5, =#0xFFFFFFFF
+    ldr r6, =#0x80000002
+    ldr r7, =#0xFFFFFFFB
 
-    LDR R4, =#0xA
-    LDR R5, =#0xFFFFFFFF
-    LDR R6, =#0x80000002
-    LDR R7, =#0xFFFFFFFB
+    @ r1: for the instructions
+    @ r2: result for testing
 
-    MOV R0, #5
-    MOV R1, R0
-    CMP R1, #5
-    MOV R0, #1
-    BNE fail
+    // --- DATA PROCESSING IMMEDIATE --- //
+    @ mov/mvn
+    mov r2, #10
+    cmp r2, r4
+    movne r0, #1
+    bne fail
 
-    MVN R0, #0
-    CMP R0, R5
-    MOV R0, #2
-    BNE fail
+    mvn r2, #0
+    cmp r2, r5
+    movne r0, #2 
+    bne fail
 
-    AND R0, R1, #15
-    CMP R0, #5
-    MOV R0, #3
-    BNE fail
+    @ and/ands
+    mov r1, #0b0011
+    and r2, r1, #0b0101
+    cmp r2, #1
+    movne r0, #3
+    bne fail
 
-    EOR R0, R1, #15
-    CMP R0, #10
-    MOV R0, #4
-    BNE fail
+    ands r2, r1, #0b0101
+    movne r0, #4
+    beq fail // Test Z != 0
+    movne r0, #5
+    blt fail // Test N != 1
+    adc r3, r2, #0
+    cmp r3, r2 // Test C != 1
+    movne r0, #6
+    bne fail
+    cmp r2, #1 // Test Result
+    movne r0, #7
+    bne fail
 
-    SUB R0, R4, #5
-    CMP R0, #5
-    MOV R0, #51
-    BNE fail
-    SUB R0, R4, #15
-    CMP R0, R7
-    MOV R0, #52
-    BNE fail
+    @ eor/eors - CV unaffected
+    mov r1, #0b0011
+    eor r2, r1, #0b0101
+    cmp r2, #0b0110
+    movne r0, #8
+    bne fail
 
-    MOV R4, #5 
-    RSB R8, R4, #10
-    CMP R8, #5
-    MOV R0, #6
-    BNE fail
+    eors r2, r1, #0b1010
+    movne r0, #9
+    beq fail //  Test Z != 0
+    movne r0, #10
+    blt fail // Test N != 1
+    cmp r2, #0b1001
+    movne r0, #11 
+    bne fail
+    
+    @ sub
+    mov r1, #10
+    sub r2, r1, #3
+    cmp r2, #7
+    movne r0, #12
+    bne fail
 
-    MOV R4, #2
-    ADD R0, R4, #3
-    CMP R0, #5
-    MOV R0, #7
-    BNE fail
+    subs r2, r1, #11
+    movne r0, #13
+    beq fail // Test Z != 0
+    blt ok // Test N
+    movne r0, #14
+    b fail
+ok: // Test V ?1
+    adc r2, r2, #0
+    cmp r2, #0
+    movne r0, #15
+    bne fail // Test C
 
-    MOV R4, #2
-    ADDS R1, R4, #1
-    ADC R0, R4, #3
-    CMP R0, #5
-    MOV R0, #8
-    BNE fail
+    @ rsb
+    rsb r2, r4, #5
+    cmp r2, r7
+    movne r0, #016
+    bne fail
 
-    MOV R4, #10
-    ADDS R1, R4, #1
+    @ add
+    add r2, r4, #2
+    cmp r2, #12
+    movne r0, #17
+    bne fail 
+
+    adds r2, r4, #-0xA
+    movne r0, #18
+    bne fail
+    movne r0, #19
+    blt fail     
+    cmp r2, #0
+    bne fail
+
+    @ sbc
+    adds r7, r4, #1
+    sbc r2, r4, #5
+    cmp r2, #4
+    movne r0, #20
+    bne fail
+
+    @ rsc // NOT COMPLETED
+    mov r7, #4
+    adds r1, r7, #1
     @Carry = 0 => ~Carry = 1
-    SBC R8, R4, #5
-    CMP R8, #4
-    MOV R0, #9
-    BNE fail
+    RSC r0, r4, #10
+    cmp r0, r5
+    movne r0, #20
+    bne fail
 
-    MOV R4, #4
-    ADDS R1, R4, #1
-    @Carry = 0 => ~Carry = 1
-    RSC R0, R4, #10
-    CMP R0, #5
-    MOV R0, #10
-    BNE fail
+    @ ORR
+    mov r1, #0b0011
+    orr r2, r1, #0b0101
+    cmp r2, #0b0111
+    movne r0, #21
+    bne fail
 
-    MOV R4, #0
-    ORR R0, R4, #5
-    CMP R0, #5
-    MOV R0, #11
-    BNE fail
+    @ BIC
+    mov r4, #10
+    bic r2, r4, #3
+    cmp r2, #8
+    movne r0, #22
+    bne fail
 
-    MOV R4, #5
-    BIC R0, R4, #10
-    CMP R0, #5
-    MOV R0, #12
-    BNE fail
+    // RESET REGISTER
+    mov r2, #0
+    mov r3, #0
+    mov r1, #0
+    ldr r4, =#0xA
+    ldr r5, =#0xFFFFFFFF
+    ldr r6, =#0x80000002
+    ldr r7, =#0xFFFFFFFB
+    // --- DATA PROCESSING IMMEDIATE SHIFT --- //
 
-    @ Tests shift par valeur immédiate, par registre, LSL, LSR, ASR, ROR
-    @ Résultats attendus par registre à chaque test:
-    @ R0 = 5 * 2 = 10
-    @ R1 = 10 // 2 = 5
-    @ R0 = 2  |   0000...0101 -> 0000...0010
-    @ R3 = 2^32 + 2    |   0000...0101 -> 1000...0010
+    mov r4, #5
+    mov r0, r4, LSL #1
+    cmp r0, #10
+    movne r0, #23
+    bne fail
 
-    @ Tests par valeur immédiate
+    mov r0, r4, LSR #1
+    cmp r0, #2
+    movne r0, #21
+    bne fail
 
-    MOV R4, #5
-    MOV R0, R4, LSL #1
-    CMP R0, #10
-    MOV R0, #20
-    BNE fail
+    mov r0, r4, ASR #1 
+    cmp r0, #2
+    movne r0, #22
+    bne fail
 
-    MOV R0, R4, LSR #1
-    CMP R0, #2
-    MOV R0, #21
-    BNE fail
+    mov r0, r4, ROR #1
+    cmp r0, r6
+    movne r0, #23
+    bne fail
 
-    MOV R0, R4, ASR #1 
-    CMP R0, #2
-    MOV R0, #22
-    BNE fail
-
-    MOV R0, R4, ROR #1
-    CMP R0, R6
-    MOV R0, #23
-    BNE fail
-
+    // RESET REGISTER
+    mov r2, #0
+    mov r3, #0
+    mov r1, #0
+    ldr r4, =#0xA
+    ldr r5, =#0xFFFFFFFF
+    ldr r6, =#0x80000002
+    ldr r7, =#0xFFFFFFFB
+    // --- DATA PROCESSING REGISTER SHIFT --- //
     @ Tests par registre
-    MOV R1, #1
+    mov r1, #1
 
-    MOV R0, R4, LSL R1
-    CMP R0, #10
-    MOV R0, #24
-    BNE fail
+    mov r0, r4, LSL r1
+    cmp r0, #20
+    movne r0, #24
+    bne fail
 
-    MOV R0, R4, LSR R1
-    CMP R0, #2
-    MOV R0, #25
-    BNE fail
+    mov r0, r4, LSR r1
+    cmp r0, #5
+    movne r0, #25
+    bne fail
 
-    MOV R0, R4, ASR R1
-    CMP R0, #2
-    MOV R0, #26
-    BNE fail
+    mov r0, r4, ASR r1
+    cmp r0, #5
+    movne r0, #26
+    bne fail
 
-    MOV R0, R4, ROR R1
-    CMP R0, R6
-    MOV R0, #27
-    BNE fail
-
-    @ Tests instruction avec S
-
-    @Case 0
-
-    MOV R4, #3
-    ADDS R0, R4, #2 
-    MOV R0, #30
-    BCS fail            @c = 1
-    MOV R0, #31
-    BVS fail            @v = 1
-
-    @Case 1
-    MOV R1, R5
-    MOV R2, #0
-
-    ANDS R0, R1, R2, LSL #2
-    MOV R0, #32
-    BCS fail
-
-    EORS R0, R1, R2
-    MOV R0, #33
-    BCS fail
-
-    @Case 2
-
-    SUBS R0, R1, R2     @   1111 1111 1111 1111        1111 1111 1111 1111
-    MOV R0, #34         @ - 0000 0000 0000 0000  <=> +10000 0000 0000 0000  => C = 1 and V = 1  
-    BCC fail            
-    MOV R0, #35
-    BVS fail
-
-    RSBS R0, R1, R2
-    MOV R0, #36
-    BCS fail
-    MOV R0, #37
-    BVS fail
+    mov r0, r4, ROR r1
+    cmp r0, #5
+    movne r0, #27
+    bne fail
+    mov r0, #0
 
 end:
-    mov r0, #0
     swi #0x123456
 
 fail:
-    mov r1, #0
-    SWI #0x123456
-    
+    swi #0x123456

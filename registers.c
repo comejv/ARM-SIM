@@ -20,6 +20,7 @@ Contact: Guillaume.Huard@imag.fr
      700 avenue centrale, domaine universitaire
      38401 Saint Martin d'H�res
 */
+#include "debug.h"
 #include "registers.h"
 #include "arm_constants.h"
 #include "util.h"
