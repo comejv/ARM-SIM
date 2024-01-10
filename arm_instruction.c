@@ -117,7 +117,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
         if (b4 == 0)
         {
             // Load/Store register offset
-            //CODE_ERREUR = arm_load_store_register_offset(p, inst);
+            CODE_ERREUR = arm_load_store_register_offset(p, inst);
         }
         else
         {
