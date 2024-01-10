@@ -90,7 +90,8 @@ int main()
     if (registers_read(r, 14, USR) == registers_read(r, 14, IRQ))
         return 1;
     printf("Test passed\n");
-
+    if (registers_read(r, 15, USR) != registers_read(r, 15, IRQ))
+        return 1;
     printf("Free registers...\n");
     registers_destroy(r);
 

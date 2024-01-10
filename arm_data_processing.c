@@ -32,10 +32,18 @@ uint32_t set_zn(arm_core p, uint32_t rd_value, uint32_t cpsr)
     {
         cpsr = set_bit(cpsr, N);
     }
+    else
+    {
+	    cpsr = clr_bit(cpsr, N);
+    }
     // set the Z bit
     if (rd_value == 0)
     {
         cpsr = set_bit(cpsr, Z);
+    }
+    else
+    {
+	    cpsr = clr_bit(cpsr, Z);
     }
 
     return cpsr;
@@ -58,13 +66,12 @@ uint32_t overflowFrom(uint32_t rn_val, uint32_t shifter_op_val, uint8_t opcode, 
 {
     uint8_t rn_sign = get_bit(rn_val, 31);                 // Get the sign of the first operand
     uint8_t shifter_op_sign = get_bit(shifter_op_val, 31); // Get the sign of the second operand
-    uint64_t true_result = 0;
+    int64_t true_result = 0;
     uint8_t result_sign;
     switch (opcode)
     {
     case ADC:
         true_result += get_bit(cpsr, C);
-        ;
     case ADD:
     case CMN:
         true_result += rn_val + shifter_op_val;
@@ -80,12 +87,12 @@ uint32_t overflowFrom(uint32_t rn_val, uint32_t shifter_op_val, uint8_t opcode, 
         break;
     case SBC:
     case RSC:
-        true_result -= ~get_bit(cpsr, C);
+        true_result = !get_bit(cpsr, C);
     case SUB:
     case CMP:
-        true_result -= rn_val - shifter_op_val;
+        true_result += rn_val - shifter_op_val;
         result_sign = get_bit(true_result, 31);
-        if ((rn_sign == shifter_op_sign) && (result_sign != rn_sign))
+        if ((rn_sign != shifter_op_sign) && (result_sign != rn_sign))
         {
             cpsr = set_bit(cpsr, V);
         }
@@ -254,7 +261,6 @@ void get_shifter_operand_immediate_shift(arm_core p, uint8_t shift_imm, uint8_t 
         {
             *shifter_operand = Rm_value;
             *shift_carry_out = get_bit(cpsr, C);
-            ;
         }
         else
         {
