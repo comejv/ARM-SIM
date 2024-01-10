@@ -250,14 +250,14 @@ arm_load_store_register_offset(arm_core p, uint32_t ins) {
     if (scaled != 0) {
         switch (shift) {
         case LSL:
-            offset = register_m << shift_imm;
+            offset <<= shift_imm;
             break;
 
         case LSR:
             if (shift_imm == 0)
                 offset = 0;
             else
-                offset = register_m >> shift_imm;
+                offset >>= shift_imm;
             break;
 
         case ASR:
@@ -267,7 +267,7 @@ arm_load_store_register_offset(arm_core p, uint32_t ins) {
                 else
                     offset = 0;
             } else {
-                offset = (int) register_m >> shift_imm;
+                offset = (int) offset >> shift_imm;
             }
             break;
 
@@ -275,7 +275,7 @@ arm_load_store_register_offset(arm_core p, uint32_t ins) {
             if (shift_imm == 0)
                 offset = (get_bit(arm_read_cpsr(p), C) << 31) | register_m >> 1;
             else
-                offset = ror(register_m, shift_imm);
+                offset = ror(offset, shift_imm);
             break;
 
         default:
