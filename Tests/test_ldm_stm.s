@@ -78,13 +78,12 @@ main:
     bne fail
     cmp r3, #0xcd
     bne fail
+    mov r0, #0
 
     // All tests passed
 end:
-    mov r0, #0
     swi 0x123456
 
 fail:
     // Some test failed
-    mov r0, #1
     swi 0x123456

@@ -4,12 +4,14 @@ load
 b fail
 b end
 
+# Continue until breakpopint end or fail
 c
 
-stepi
-
+# Get register value
 set $ret = $r0
 
-c
+# Step over swi instruction
+stepi
 
+# Return error code
 q $ret

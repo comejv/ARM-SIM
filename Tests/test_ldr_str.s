@@ -229,7 +229,7 @@ main:
 
     strb r0, [r2, -r7] // Mem[0x1ff6] = #0x78345678
     ldrb r3, [r2, -r7] // r3 = #0x78
-    cmp r3, r0
+    cmp r3, #0x78
     movne r0, #32
     bne fail
 
@@ -327,7 +327,7 @@ main:
     movne r0, #47
     bne fail
     ldrb r3, [r2], r7 // r2 = #0x2000 & r3 = #0x78 
-    cmp r3, r0
+    cmp r3, #0x78
     movne r0, #48
     bne fail
 
@@ -384,11 +384,17 @@ main:
     str r5, [r2]
     str r0, [r2, r7, lsl #2] // Mem[0x2000 + #0x5 << 4] = Mem[0x2014] = #0x12345678
     ldr r3, [r2, r7, lsl #2] // r3 = #0x12345678
+    ldr r8, =#0x2014
+    ldr r4, [r8]
+    cmp r4, r3
+    movne r0, #55
+    bne fail
     cmp r3, r0
     movne r0, #55
     bne fail
 
     // STR Post Positive LDR Pre Negative With LSR
+    str r2, [r5]
     strb r0, [r2], r7, lsr #2 // Mem[0x2000] = #0x78000000, r2 = #0x2001
     ldr r4, [r5]
     add r4, r4, #0x1
@@ -419,12 +425,11 @@ main:
     cmp r3, #0x78
     movne r0, #61
     bne fail
-
+    mov r0, #0
     
     /* *********** */
     // All tests passed
 end:
-    mov r0, #0
     swi #0x123456
 
 fail:
