@@ -237,7 +237,6 @@ arm_load_store_register_offset(arm_core p, uint32_t ins) {
     uint8_t register_d = get_bits(ins, 15, 12);
     uint8_t shift_imm = get_bits(ins, 11, 7);
     uint8_t shift = get_bits(ins, 6, 5);
-    uint8_t bit_4 = get_bit(ins, 4);
     uint8_t register_m = get_bits(ins, 3, 0);
     uint32_t offset = arm_read_register(p, register_m);
     uint32_t address_base = arm_read_register(p, register_n);
