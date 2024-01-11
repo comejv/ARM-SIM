@@ -5,6 +5,7 @@ void my_exit();
 void my_putchar(char c);
 void my_printint(int n);
 void my_printstr(char* str);
+int my_scanfint();
 void acquitter_irq();
 
 #endif

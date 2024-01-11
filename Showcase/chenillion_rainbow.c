@@ -17,7 +17,9 @@ int main()
                 x = my_modulo(i + j, len-1);
                 temp[j] = text[x];
             }
-    
+            my_printstr("\x1b[");
+            my_printint( my_modulo(i, 7) == 0 ? 93 : my_modulo(i, 7)+ 90);
+            my_printstr("m");
             my_printstr(temp);
             my_putchar('\r'); // Retour au début de la ligne
             my_clock(50000);

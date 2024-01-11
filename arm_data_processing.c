@@ -34,7 +34,7 @@ uint32_t set_zn(arm_core p, uint32_t rd_value, uint32_t cpsr)
     }
     else
     {
-	    cpsr = clr_bit(cpsr, N);
+        cpsr = clr_bit(cpsr, N);
     }
     // set the Z bit
     if (rd_value == 0)
@@ -43,13 +43,13 @@ uint32_t set_zn(arm_core p, uint32_t rd_value, uint32_t cpsr)
     }
     else
     {
-	    cpsr = clr_bit(cpsr, Z);
+        cpsr = clr_bit(cpsr, Z);
     }
 
     return cpsr;
 }
 
-uint8_t carryFrom(uint64_t true_result, int32_t cpsr)
+uint32_t carryFrom(uint64_t true_result, int32_t cpsr)
 {
     if (true_result >= 0x100000000)
     {
@@ -226,7 +226,7 @@ int apply_operator(arm_core p, uint32_t ins, uint32_t shifter_operand, uint8_t s
         {
         case 0:
             /* code */
-            cpsr = carryFrom(Rd_value, cpsr);                             // Update C flag
+            cpsr = carryFrom(Rd_value, cpsr); // Update C flag
             cpsr = overflowFrom(Rn_value, shifter_operand, opcode, cpsr); // Update V flag
             break;
         case 1:
@@ -247,6 +247,7 @@ int apply_operator(arm_core p, uint32_t ins, uint32_t shifter_operand, uint8_t s
         default:
             break;
         }
+        debug("Updating CPSR value to: %x\n", cpsr);
         arm_write_cpsr(p, cpsr);
     }
     return 0;

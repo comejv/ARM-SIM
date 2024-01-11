@@ -1,14 +1,5 @@
 #include "my_syscalls.h"
-
-void message()
-{
-    my_putchar('I');
-    my_putchar('\n');
-    my_putchar('R');
-    my_putchar('\n');
-    my_putchar('Q');
-    my_putchar('\n');
-}
+#include "my_utils.h"
 
 void irq_handler(void)
 {
@@ -16,7 +7,7 @@ void irq_handler(void)
     asm("mov %0, lr" : "=r"(lr));
     /* Here your irq code */
 
-    message();
+    asm("sub r8, r8, #1");
 
     /**********************/
     asm("mov lr, %0" : "=r"(lr));
@@ -29,10 +20,37 @@ void __attribute__((section(".irq_vector"), naked)) irq_vector(void)
         "b irq_handler");
 }
 
-int main()
+void main()
 {
+    int n_min = 5;
+    asm("mov r8, %0" : "=r"(n_min));
+
     while (1)
     {
+        asm("mov %0, r8" : "=r"(n_min));
+        my_printstr("\x1b[2K\x1b[");
+        my_printint(my_modulo(n_min, 7) == 0 ? 93 : my_modulo(n_min, 7) + 90);
+        my_printstr("m");
+
+        switch (n_min)
+        {
+        case -1:
+            my_printstr("Et oh j'ai dit que c'était fini !\n");
+            my_exit();
+        case 0:
+            my_printstr("La présentation est finie !\r");
+            break;
+        case 1:
+            my_printstr("Il ne reste plus que ");
+            my_printint(n_min);
+            my_printstr(" minute de présentation...\r");
+            break;
+        default:
+            my_printstr("Il ne reste plus que ");
+            my_printint(n_min);
+            my_printstr(" minutes de présentation...\r");
+            break;
+        }
     }
-    return 0;
+    my_exit();
 }
