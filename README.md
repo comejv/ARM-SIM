@@ -51,6 +51,18 @@ Tests are available for these features :
 - [X] Inter register instructions : `bash test_features.bash`
 - [ ] Coprocessor instructions (not implemented)
 
+## Showcases
+
+Programs using the simulator to work, for it to work you have to run `./arm_simulator`
+Then to run the program you want, you use the following commands : 
+```gdb
+arm-none-eabi-gdb
+file Showcase/<program_name>
+target remote localhost:<port number given by the simulator>
+set endian big
+c
+```
+Then for programs that need an user input (tictactoe), you have to put your input in the terminal running the simulator.
 ## Acknowledgements
 
 This project uses resources available on [ARM's official website](https://www.arm.com) for the ARMv5 reference manual and `arm-none-eabi-gdb` for debugging capabilities.
