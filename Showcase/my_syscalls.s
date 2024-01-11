@@ -20,5 +20,4 @@ my_scanfint:
     swi 0x000004
     mov pc, lr
 acquitter_irq:
-    swi 0xFFFFFF
-    mov pc, lr
+    subs pc, r14, #4

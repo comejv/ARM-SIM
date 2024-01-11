@@ -25,15 +25,14 @@ Contact: Guillaume.Huard@imag.fr
 #include <stdint.h>
 #include "arm_core.h"
 
-
 /**
  * @brief      Load/Store word or unsigned byte
  * @details    This function implements the load/store word or unsigned byte instruction
  * @param      p     The processor
  * @param      ins   The instruction
- * 
+ *
  * @return     0 if the instruction is executed correctly or ARM exception
-*/
+ */
 int arm_load_store_miscellaneous(arm_core p, uint32_t ins);
 
 /**
@@ -41,9 +40,9 @@ int arm_load_store_miscellaneous(arm_core p, uint32_t ins);
  * @details    This function implements the load/store halfword instruction
  * @param      p     The processor
  * @param      ins   The instruction
- * 
+ *
  * @return     0 if the instruction is executed correctly or ARM exception
-*/
+ */
 int arm_load_store_immediate_offset(arm_core p, uint32_t ins);
 
 /**
@@ -51,9 +50,9 @@ int arm_load_store_immediate_offset(arm_core p, uint32_t ins);
  * @details    This function implements the load/store register offset instruction
  * @param      p     The processor
  * @param      ins   The instruction
- * 
+ *
  * @return     0 if the instruction is executed correctly or ARM exception
-*/
+ */
 int arm_load_store_register_offset(arm_core p, uint32_t ins);
 
 /**
@@ -61,9 +60,9 @@ int arm_load_store_register_offset(arm_core p, uint32_t ins);
  * @details    This function implements the load/store multiple instruction
  * @param      p     The processor
  * @param      ins   The instruction
- * 
+ *
  * @return     0 if the instruction is executed correctly or ARM exception
-*/
+ */
 int arm_load_store_multiple(arm_core p, uint32_t ins);
 
 /**
@@ -71,9 +70,9 @@ int arm_load_store_multiple(arm_core p, uint32_t ins);
  * @details    This function implements the load/store coprocessor instruction
  * @param      p     The processor
  * @param      ins   The instruction
- * 
+ *
  * @return     0 if the instruction is executed correctly or ARM exception
-*/
+ */
 int arm_coprocessor_load_store(arm_core p, uint32_t ins);
 
 #endif

@@ -19,7 +19,7 @@ noinst_PROGRAMS=insertion_sort fibonacci clock chenillion chenillion_rainbow tic
 
 all-am: $(PROGS)
 endif
-clock_SOURCES=clock.c my_syscalls.s my_syscalls.h
+clock_SOURCES=clock.c my_syscalls.s my_syscalls.h my_utils.h my_utils.c
 fibonacci_SOURCES=fibonacci.c my_syscalls.s my_syscalls.h
 insertion_sort_SOURCES=insertion_sort.c my_syscalls.s my_syscalls.h
 chenillion_SOURCES=chenillion.c my_syscalls.s my_syscalls.h my_utils.c my_utils.h

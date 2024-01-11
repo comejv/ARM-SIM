@@ -48,10 +48,9 @@ Contact: Guillaume.Huard@imag.fr
 #define R11 11
 #define R12 12
 #define R13 13
-#define SP 13 
+#define SP 13
 #define LR 14
 #define PC 15
-
 
 /* ARM Exceptions (by priority) */
 #define RESET 1
