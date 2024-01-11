@@ -31,7 +31,7 @@ Contact: Guillaume.Huard@imag.fr
 
 static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
 {
-    int CODE_ERREUR = UNDEFINED_INSTRUCTION;
+    int err = UNDEFINED_INSTRUCTION;
     uint8_t instcode = get_bits(inst, 27, 25);
     uint8_t b4 = get_bit(inst, 4);
     uint8_t b7 = get_bit(inst, 7);
@@ -53,12 +53,12 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
             if (opcode2b == 2 && S == 0)
             {
                 // Misceallaneous instruction (1)
-                CODE_ERREUR = arm_miscellaneous(p, inst);
+                err = arm_miscellaneous(p, inst);
             }
             else
             {
                 // Data processing immediate shift
-                CODE_ERREUR = arm_data_processing_immediate_shift(p, inst, cpsr);
+                err = arm_data_processing_immediate_shift(p, inst, cpsr);
             }
         }
         else
@@ -67,12 +67,12 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
             {
                 if (opcode2b == 2 && S == 0)
                 {
-                    CODE_ERREUR = arm_miscellaneous_2(p, inst, cpsr);
+                    err = arm_miscellaneous_2(p, inst, cpsr);
                 }
                 else
                 {
                     // Data processing register shift
-                    CODE_ERREUR = arm_data_processing_register_shift(p, inst, cpsr);
+                    err = arm_data_processing_register_shift(p, inst, cpsr);
                 }
             }
             else
@@ -80,12 +80,12 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
                 // Multiplies; Extra load/stores
                 if (b5 == 0 && b6 == 0)
                 {
-                    CODE_ERREUR = arm_multiply(p, inst, cpsr);
+                    err = arm_multiply(p, inst, cpsr);
                 }
                 else
                 {
                     // Extra load/stores
-                    CODE_ERREUR = arm_load_store_miscellaneous(p, inst);
+                    err = arm_load_store_miscellaneous(p, inst);
                 }
             }
         }
@@ -95,7 +95,7 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
         {
             if (b21 == 0)
             {
-                CODE_ERREUR = UNDEFINED_INSTRUCTION;
+                err = UNDEFINED_INSTRUCTION;
             }
             else
             {
@@ -106,18 +106,18 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
         {
             // Data processing immediate
             debug("Data processing immediate, ins: %x\n", inst);
-            CODE_ERREUR = arm_data_processing_immediate(p, inst, cpsr);
+            err = arm_data_processing_immediate(p, inst, cpsr);
         }
         break;
     case 0x2:
         // Load/Store immediate offset
-        CODE_ERREUR = arm_load_store_immediate_offset(p, inst);
+        err = arm_load_store_immediate_offset(p, inst);
         break;
     case 0x3:
         if (b4 == 0)
         {
             // Load/Store register offset
-            CODE_ERREUR = arm_load_store_register_offset(p, inst);
+            err = arm_load_store_register_offset(p, inst);
         }
         else
         {
@@ -134,15 +134,15 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
         break;
     case 0x4:
         // Load/Store multiple
-        CODE_ERREUR = arm_load_store_multiple(p, inst);
+        err = arm_load_store_multiple(p, inst);
         break;
     case 0x5:
         // Branch and branch with link
-        CODE_ERREUR = arm_branch(p, inst);
+        err = arm_branch(p, inst);
         break;
     case 0x6:
         // Coprocessor load/store and register transfers
-        CODE_ERREUR = arm_coprocessor_load_store(p, inst);
+        err = arm_coprocessor_load_store(p, inst);
         break;
     case 0x7:
         if (b24 == 0)
@@ -159,14 +159,14 @@ static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
         else
         {
             // Software interrupt
-            CODE_ERREUR = arm_coprocessor_others_swi(p, inst);
+            err = arm_coprocessor_others_swi(p, inst);
         }
         break;
     default:
-    // Should not happen
+        // Should not happen
         return UNDEFINED_INSTRUCTION;
     }
-    return CODE_ERREUR;
+    return err;
 }
 
 static int arm_execute_instruction(arm_core p)
@@ -177,43 +177,43 @@ static int arm_execute_instruction(arm_core p)
     {
         uint8_t cond_inst = get_bits(inst, 31, 28);
         uint32_t cpsr = arm_read_cpsr(p);
-        int FLAG_COND = 0;
+        int flag_cond = 0;
         uint8_t cpsr_Z = get_bit(cpsr, Z);
         uint8_t cpsr_N = get_bit(cpsr, N);
         uint8_t cpsr_C = get_bit(cpsr, C);
         uint8_t cpsr_V = get_bit(cpsr, V);
         debug("ZNCV : %d %d %d %d\n", cpsr_Z, cpsr_N, cpsr_C, cpsr_V);
         if (cond_inst == EQ && cpsr_Z == 1)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == NE && cpsr_Z == 0)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == CS && cpsr_C == 1)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == CC && cpsr_C == 0)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == MI && cpsr_N == 1)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == PL && cpsr_N == 0)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == VS && cpsr_V == 1)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == VC && cpsr_V == 0)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == HI && cpsr_C == 1 && cpsr_Z == 0)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == LS && cpsr_C == 1 && cpsr_Z == 1)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == GE && cpsr_N == cpsr_V)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == LT && cpsr_N != cpsr_V)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == GT && cpsr_Z == 0 && cpsr_N == cpsr_V)
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == LE && (cpsr_Z == 1 || cpsr_N != cpsr_V))
-            FLAG_COND = 1;
+            flag_cond = 1;
         else if (cond_inst == AL)
-            FLAG_COND = 1;
-        if (FLAG_COND)
+            flag_cond = 1;
+        if (flag_cond)
         {
             return arm_fetch_code_inst(p, inst, cpsr);
         }
@@ -224,7 +224,6 @@ static int arm_execute_instruction(arm_core p)
     }
     return 1;
 }
-
 
 int arm_step(arm_core p)
 {
