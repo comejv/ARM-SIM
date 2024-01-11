@@ -16,5 +16,4 @@ my_printstr:
     swi 0x000003
     mov pc, lr
 acquitter_irq:
-    swi 0xFFFFFF
-    mov pc, lr
+    subs pc, r14, #4
