@@ -20,6 +20,7 @@ tests=()
 tests+=("Tests/test_ldr_str")
 tests+=("Tests/test_data_processing")
 tests+=("Tests/test_ldm_stm")
+tests+=("Tests/test_ldrd_strd")
 
 for test in "${tests[@]}"; do
     echo -e "\x1b[34mInfo : Running test $test\x1b[0m"

@@ -493,10 +493,13 @@ arm_load_store_miscellaneous(arm_core p, uint32_t ins)
         {
             err = arm_read_word(p, address, &value_word);
             arm_write_register(p, rd, (uint32_t) value_word);
+	    debug("Reading word 0x%x from address 0x%x and storing in register %d\n", value_word, address, rd);
             if (err)
                 break;
             err = arm_read_word(p, address + 4, &value_word);
             arm_write_register(p, rd + 1, (uint32_t) value_word);
+	    debug("Reading word 0x%x from address 0x%x and storing in register %d\n", value_word, address + 4, rd + 1);
+	    debug("Err : %d\n", err);
         }
         else
         {
@@ -508,10 +511,13 @@ arm_load_store_miscellaneous(arm_core p, uint32_t ins)
         {
             value_word = (uint32_t) arm_read_register(p, rd);
             err = arm_write_word(p, address, value_word);
+	    debug("Writing register %d, value 0x%x to address 0x%x\n", rd, value_word, address);
             if (err)
                 break;
             value_word = (uint32_t) arm_read_register(p, rd + 1);
-            err = arm_write_register(p, address + 4, value_word);
+            err = arm_write_word(p, address + 4, value_word);
+	    debug("Writing register %d, value 0x%x to address 0x%x\n", rd + 1, value_word, address + 4);
+	    debug("Err : %d\n", err);
         }
         else
         {
