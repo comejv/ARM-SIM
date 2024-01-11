@@ -15,14 +15,13 @@ AM_LDFLAGS=-nostdlib -T $(srcdir)/linker_script -n --entry main
 AM_LDFLAGS+=-Wl,-EB
 
 if HAVE_ARM_COMPILER
-noinst_PROGRAMS=test_ldr_str test_data_processing test_ldm_stm test_ldrd_strd
+noinst_PROGRAMS=test_ldr_str test_data_processing test_ldm_stm
 
 all-am: $(PROGS)
 endif
 test_data_processing_SOURCES=test_data_processing.s
 test_ldr_str_SOURCES=test_ldr_str.s
 test_ldm_stm_SOURCES=test_ldm_stm.s
-test_ldrd_strd_SOURCES=test_ldrd_strd.s
 
 EXTRA_DIST=linker_script
 

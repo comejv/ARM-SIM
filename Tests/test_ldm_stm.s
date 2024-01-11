@@ -36,7 +36,7 @@ main:
     mov r2, #0
     mov r3, #0
     // Load Multiple Increment Before (Full Ascending)
-    ldmia r5!,  {r8, r1, r2, r3}
+    ldmia r5!, {r8, r1, r2, r3}
     cmp r8, #0x12
     bne fail
     cmp r1, #0x56
@@ -47,7 +47,7 @@ main:
     bne fail
 
     // Store Multiple Decrement After (Empty Ascending)
-    push  {r8, r1, r2, r3}
+    push {r8, r1, r2, r3}
     mov r8, #0
     mov r1, #0
     mov r2, #0
@@ -64,6 +64,18 @@ main:
     bne fail
     mov r0, #0
 
+    mov r0, #0x12
+    mov r1, #0x23
+    mov r2, #0x2000
+    strd r0, [r2]
+    ldrd r4, [r2]
+    cmp r0, r4
+    movne r0, #1
+    bne fail
+    cmp r1, r5
+    movne r0, #2
+    bne fail
+    mov r0, #0
     // All tests passed
 end:
     swi 0x123456
