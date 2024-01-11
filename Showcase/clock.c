@@ -4,19 +4,29 @@ void message()
 {
     my_putchar('I');
     my_putchar('\n');
+    my_putchar('R');
+    my_putchar('\n');
+    my_putchar('Q');
+    my_putchar('\n');
 }
 
 void irq_handler(void)
 {
+    int lr;
+    asm("mov %0, lr" : "=r"(lr));
+    /* Here your irq code */
+
     message();
-    acquitter_irq();
+
+    /**********************/
+    asm("mov lr, %0" : "=r"(lr));
+    asm("b acquitter_irq");
 }
 
 void __attribute__((section(".irq_vector"), naked)) irq_vector(void)
 {
     asm volatile(
-        "b irq_handler"
-    );
+        "b irq_handler");
 }
 
 int main()

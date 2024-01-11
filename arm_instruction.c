@@ -31,7 +31,7 @@ Contact: Guillaume.Huard@imag.fr
 
 static int arm_fetch_code_inst(arm_core p, uint32_t inst, uint32_t cpsr)
 {
-    int CODE_ERREUR = 0;
+    int CODE_ERREUR = UNDEFINED_INSTRUCTION;
     uint8_t instcode = get_bits(inst, 27, 25);
     uint8_t b4 = get_bit(inst, 4);
     uint8_t b7 = get_bit(inst, 7);
