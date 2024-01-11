@@ -10,7 +10,7 @@ The simulator (server) and `gdb` (client) interact via a TCP/IP network communic
 
 ## Installation
 
-To install the project first download the repository, then in the project directory run `autoreconf && ./configure CFLAGS='-Wall -Werror -g'` and then you can `make`. You should obtain an executable file `./arm_simulator`.
+To install the project first download the repository, then in the project directory run `autoreconf && ./configure CFLAGS='-Wall -Werror -g -O0'` and then you can `make`. You should obtain an executable file `./arm_simulator`.
 
 ## Usage
 
