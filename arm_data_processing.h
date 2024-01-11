@@ -43,74 +43,72 @@ Contact: Guillaume.Huard@imag.fr
 #define BIC 0b1110
 #define MVN 0b1111
 
-
 /**
  * @brief A function that apply the operation using Rn and shifter_operand and store the result (if necesserary) in Rd.
  * Update CPSR zncv flags if S using cpsr_ptr and shifter_carry_out
- * 
- * @param p arm_core, all the simulator state 
+ *
+ * @param p arm_core, all the simulator state
  * @param ins the instruction
- * @param shifter_operand used as 2nd operand for the data processing operations 
+ * @param shifter_operand used as 2nd operand for the data processing operations
  * @param shifter_carry_out can be used for zncv flags
- * @param S 
+ * @param S
  * @param cpsr value
  * @return int the error code of the instruction readed (0 if no error)
  */
 int apply_operator(arm_core p, uint32_t ins, uint32_t shifter_operand, uint8_t shifter_carry_out, uint8_t S, uint32_t cpsr);
 
 /**
- * @brief Get the shifter operand for immediate shift instruction format 
- * 
- * @param p arm_core, all the simulator state 
+ * @brief Get the shifter operand for immediate shift instruction format
+ *
+ * @param p arm_core, all the simulator state
  * @param shift_code the shift code that said which operation we should apply (LSL, LSR....)
- * @param Rm_value the value of the Rm registry 
- * @param Rs_value the value of the Rs registry 
- * @param S the value of the S bit. If 1, we calculate the shift_carry_out. 
- * @param shifter_operand A pointer to modify the shifting operand value 
- * @param shift_carry_out A pointer to modify the shifting carry out value 
+ * @param Rm_value the value of the Rm registry
+ * @param Rs_value the value of the Rs registry
+ * @param S the value of the S bit. If 1, we calculate the shift_carry_out.
+ * @param shifter_operand A pointer to modify the shifting operand value
+ * @param shift_carry_out A pointer to modify the shifting carry out value
  * @param cpsr cpsr value
  * side effect : modify the value of shifter_operand, shift_carry_out and cpsr_ptr
  */
 void get_shifter_operand_immediate_shift(arm_core p, uint8_t shift_imm, uint8_t shift_code, uint32_t Rm_value, uint8_t S, uint32_t *shifter_operand, uint8_t *shift_carry_out, uint32_t cpsr);
 
 /**
- * @brief Get the shifter operand for register shift instruction format 
- * 
- * @param p arm_core, all the simulator state 
+ * @brief Get the shifter operand for register shift instruction format
+ *
+ * @param p arm_core, all the simulator state
  * @param shift_code the shift code that said which operation we should apply (LSL, LSR....)
- * @param Rm_value the value of the Rm registry 
- * @param Rs_value the value of the Rs registry 
- * @param S the value of the S bit. If 1, we calculate the shift_carry_out. 
- * @param shifter_operand A pointer to modify the shifting operand value 
- * @param shift_carry_out A pointer to modify the shifting carry out value 
- * @param cpsr_ptr A pointer 
+ * @param Rm_value the value of the Rm registry
+ * @param Rs_value the value of the Rs registry
+ * @param S the value of the S bit. If 1, we calculate the shift_carry_out.
+ * @param shifter_operand A pointer to modify the shifting operand value
+ * @param shift_carry_out A pointer to modify the shifting carry out value
+ * @param cpsr_ptr A pointer
  * side effect : modify the value of shifter_operand, shift_carry_out and cpsr_ptr
  */
 void get_shifter_operand_register_shift(arm_core p, uint8_t shift_code, uint32_t Rm_value, uint32_t Rs_value, uint8_t S, uint32_t *shifter_operand, uint8_t *shift_carry_out, uint32_t cpsr);
 
-
 /**
- * @brief A handler for data processing instruction using immediate with shift 
- * 
- * @param p arm_core, all the simulator state 
+ * @brief A handler for data processing instruction using immediate with shift
+ *
+ * @param p arm_core, all the simulator state
  * @param ins the instruction readed
  * @return int, the error code of the instruction reading (0 if no error)
  */
 int arm_data_processing_immediate_shift(arm_core p, uint32_t ins, uint32_t cpsr);
 
 /**
- * @brief A handler for data processing instruction using registers with shift 
- * 
- * @param p arm_core, all the simulator state 
+ * @brief A handler for data processing instruction using registers with shift
+ *
+ * @param p arm_core, all the simulator state
  * @param ins the instruction readed
  * @return int, the error code of the instruction readed (0 if no error)
  */
 int arm_data_processing_register_shift(arm_core p, uint32_t ins, uint32_t cpsr);
 
 /**
- * @brief A handler for data processing instruction using immediate 
- * 
- * @param p arm_core, all the simulator state 
+ * @brief A handler for data processing instruction using immediate
+ *
+ * @param p arm_core, all the simulator state
  * @param ins the instruction readed
  * @return int the error code of the instruction readed (0 if no error)
  */

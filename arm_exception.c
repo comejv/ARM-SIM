@@ -72,7 +72,7 @@ int arm_exception(arm_core p, uint8_t exception)
         uint32_t instruction;
         arm_read_word(p, address, &instruction);
         instruction &= 0xFFFFFF;
-        
+
         switch (instruction)
         {
         case 0x123456:
@@ -91,7 +91,7 @@ int arm_exception(arm_core p, uint8_t exception)
             print_string(p);
             return 0;
         case 0x000004:
-            arm_write_register(p,0,scanint(p));
+            arm_write_register(p, 0, scanint(p));
             return 0;
         default:
             printf("Unknown software interrupt %x\n", instruction);

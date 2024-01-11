@@ -1,24 +1,24 @@
 /*
-Armator - simulateur de jeu d'instruction ARMv5T à but pédagogique
+Armator - simulateur de jeu d'instruction ARMv5T ï¿½ but pï¿½dagogique
 Copyright (C) 2011 Guillaume Huard
 Ce programme est libre, vous pouvez le redistribuer et/ou le modifier selon les
-termes de la Licence Publique Générale GNU publiée par la Free Software
-Foundation (version 2 ou bien toute autre version ultérieure choisie par vous).
+termes de la Licence Publique Gï¿½nï¿½rale GNU publiï¿½e par la Free Software
+Foundation (version 2 ou bien toute autre version ultï¿½rieure choisie par vous).
 
-Ce programme est distribué car potentiellement utile, mais SANS AUCUNE
+Ce programme est distribuï¿½ car potentiellement utile, mais SANS AUCUNE
 GARANTIE, ni explicite ni implicite, y compris les garanties de
-commercialisation ou d'adaptation dans un but spécifique. Reportez-vous à la
-Licence Publique Générale GNU pour plus de détails.
+commercialisation ou d'adaptation dans un but spï¿½cifique. Reportez-vous ï¿½ la
+Licence Publique Gï¿½nï¿½rale GNU pour plus de dï¿½tails.
 
-Vous devez avoir reçu une copie de la Licence Publique Générale GNU en même
-temps que ce programme ; si ce n'est pas le cas, écrivez à la Free Software
+Vous devez avoir reï¿½u une copie de la Licence Publique Gï¿½nï¿½rale GNU en mï¿½me
+temps que ce programme ; si ce n'est pas le cas, ï¿½crivez ï¿½ la Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,
-États-Unis.
+ï¿½tats-Unis.
 
 Contact: Guillaume.Huard@imag.fr
-	 Bâtiment IMAG
-	 700 avenue centrale, domaine universitaire
-	 38401 Saint Martin d'Hères
+     Bï¿½timent IMAG
+     700 avenue centrale, domaine universitaire
+     38401 Saint Martin d'Hï¿½res
 */
 #include <sys/socket.h>
 #include <pthread.h>
@@ -31,7 +31,8 @@ Contact: Guillaume.Huard@imag.fr
 #include "trace.h"
 #include "debug.h"
 
-struct shared_data {
+struct shared_data
+{
     registers reg;
     memory mem;
     arm_core arm;
@@ -39,12 +40,14 @@ struct shared_data {
     in_port_t gdb_port, irq_port;
 };
 
-struct server_data {
+struct server_data
+{
     int socket;
     unsigned short port;
 };
 
-static struct server_data create_server(in_port_t port) {
+static struct server_data create_server(in_port_t port)
+{
     struct sockaddr_in addr;
     socklen_t addr_length;
     struct server_data result;
@@ -56,17 +59,18 @@ static struct server_data create_server(in_port_t port) {
     addr.sin_port = htons(port);
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    Bind(result.socket, (struct sockaddr *) &addr, sizeof(addr));
+    Bind(result.socket, (struct sockaddr *)&addr, sizeof(addr));
     addr_length = sizeof(addr);
-    getsockname(result.socket, (struct sockaddr *) &addr, &addr_length);
+    getsockname(result.socket, (struct sockaddr *)&addr, &addr_length);
     result.port = ntohs(addr.sin_port);
 
     Listen(result.socket, 1);
     return result;
 }
 
-static void *gdb_listener(void *arg) {
-    struct shared_data *shared = (struct shared_data *) arg;
+static void *gdb_listener(void *arg)
+{
+    struct shared_data *shared = (struct shared_data *)arg;
     struct sockaddr_in peer;
     int connection;
     socklen_t peer_length;
@@ -75,7 +79,7 @@ static void *gdb_listener(void *arg) {
     server = create_server(shared->gdb_port);
     fprintf(stderr, "Listening to gdb connection on port %d\n", server.port);
     peer_length = sizeof(peer);
-    connection = Accept(server.socket, (struct sockaddr *) &peer, &peer_length);
+    connection = Accept(server.socket, (struct sockaddr *)&peer, &peer_length);
     gdb_scanner(shared->arm, shared->reg, shared->mem, connection, connection, &shared->lock);
     shutdown(connection, SHUT_RDWR);
     close(server.socket);
@@ -83,8 +87,9 @@ static void *gdb_listener(void *arg) {
     pthread_exit(NULL);
 }
 
-static void *irq_listener(void *arg) {
-    struct shared_data *shared = (struct shared_data *) arg;
+static void *irq_listener(void *arg)
+{
+    struct shared_data *shared = (struct shared_data *)arg;
     struct sockaddr_in peer;
     int connection;
     socklen_t peer_length;
@@ -93,10 +98,12 @@ static void *irq_listener(void *arg) {
 
     server = create_server(shared->irq_port);
     fprintf(stderr, "Listening to irq connections on port %d\n", server.port);
-    while (1) {
+    while (1)
+    {
         peer_length = sizeof(peer);
-        connection = Accept(server.socket, (struct sockaddr *) &peer, &peer_length);
-        while (Read(connection, &irq, 1) > 0) {
+        connection = Accept(server.socket, (struct sockaddr *)&peer, &peer_length);
+        while (Read(connection, &irq, 1) > 0)
+        {
             pthread_mutex_lock(&shared->lock);
             arm_exception(shared->arm, irq);
             pthread_mutex_unlock(&shared->lock);
@@ -108,28 +115,31 @@ static void *irq_listener(void *arg) {
     pthread_exit(NULL);
 }
 
-void usage(char *name) {
+void usage(char *name)
+{
     fprintf(stderr, "Usage:\n"
-            "%s [ --help ] [ --gdb-port port ] [ --irq-port port ] "
-            "[ --trace-file file ] [ --trace-registers ] [ --trace-memory ] "
-            "[ --trace-state ] [ --trace-position ] [ --debug filename ]\n\n"
-            "Start an ARMv5 instruction set simulator that acts as a gdb server "
-            "and can receive interrupts. It is possible to specify on which ports "
-            "the simulator listen to gdb client or irq sending program "
-            "connections. Trace options have the following behavior:\n"
-            "- trace file: file into which trace information is stored (default is"
-            " stdout)\n"
-            "- trace registers: outputs informations about each access to"
-            " registers\n"
-            "- trace memory: outputs informations about each access to memory\n"
-            "- trace state: outputs the processor state after each instruction\n"
-            "- trace position: for each traced access, outputs the file and line"
-            " at which the access has been performed\n"
-            "The debug switch enable selective reporting of debug messages on a "
-            "per source file basis\n", name);
+                    "%s [ --help ] [ --gdb-port port ] [ --irq-port port ] "
+                    "[ --trace-file file ] [ --trace-registers ] [ --trace-memory ] "
+                    "[ --trace-state ] [ --trace-position ] [ --debug filename ]\n\n"
+                    "Start an ARMv5 instruction set simulator that acts as a gdb server "
+                    "and can receive interrupts. It is possible to specify on which ports "
+                    "the simulator listen to gdb client or irq sending program "
+                    "connections. Trace options have the following behavior:\n"
+                    "- trace file: file into which trace information is stored (default is"
+                    " stdout)\n"
+                    "- trace registers: outputs informations about each access to"
+                    " registers\n"
+                    "- trace memory: outputs informations about each access to memory\n"
+                    "- trace state: outputs the processor state after each instruction\n"
+                    "- trace position: for each traced access, outputs the file and line"
+                    " at which the access has been performed\n"
+                    "The debug switch enable selective reporting of debug messages on a "
+                    "per source file basis\n",
+            name);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     struct shared_data shared;
     pthread_t gdb_thread;
     pthread_t irq_thread;
@@ -138,24 +148,24 @@ int main(int argc, char *argv[]) {
     FILE *trace_file;
 
     struct option longopts[] = {
-        { "gdb-port", required_argument, NULL, 'g' },
-        { "irq-port", required_argument, NULL, 'i' },
-        { "trace-file", required_argument, NULL, 't' },
-        { "trace-registers", no_argument, NULL, 'r' },
-        { "trace-memory", no_argument, NULL, 'm' },
-        { "trace-state", required_argument, NULL, 's' },
-        { "trace-position", no_argument, NULL, 'p' },
-        { "help", no_argument, NULL, 'h' },
-        { "debug", required_argument, NULL, 'd' },
-        { NULL, 0, NULL, 0 }
-    };
+        {"gdb-port", required_argument, NULL, 'g'},
+        {"irq-port", required_argument, NULL, 'i'},
+        {"trace-file", required_argument, NULL, 't'},
+        {"trace-registers", no_argument, NULL, 'r'},
+        {"trace-memory", no_argument, NULL, 'm'},
+        {"trace-state", required_argument, NULL, 's'},
+        {"trace-position", no_argument, NULL, 'p'},
+        {"help", no_argument, NULL, 'h'},
+        {"debug", required_argument, NULL, 'd'},
+        {NULL, 0, NULL, 0}};
 
     shared.gdb_port = 0;
     shared.irq_port = 0;
     trace_file = stdout;
-    while ((opt = getopt_long(argc, argv, "g:i:ht:rmspd:", longopts, NULL))
-           != -1) {
-        switch (opt) {
+    while ((opt = getopt_long(argc, argv, "g:i:ht:rmspd:", longopts, NULL)) != -1)
+    {
+        switch (opt)
+        {
         case 'g':
             shared.gdb_port = atoi(optarg);
             break;
@@ -167,7 +177,8 @@ int main(int argc, char *argv[]) {
             exit(0);
         case 't':
             trace_file = fopen(optarg, "w");
-            if (trace_file == NULL) {
+            if (trace_file == NULL)
+            {
                 perror("Trace file");
                 exit(1);
             }

@@ -16,9 +16,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,
 �tats-Unis.
 
 Contact: Guillaume.Huard@imag.fr
-	 B�timent IMAG
-	 700 avenue centrale, domaine universitaire
-	 38401 Saint Martin d'H�res
+     B�timent IMAG
+     700 avenue centrale, domaine universitaire
+     38401 Saint Martin d'H�res
 */
 #include "arm_core.h"
 #include "registers.h"
@@ -41,17 +41,20 @@ Contact: Guillaume.Huard@imag.fr
 #define ENDIANESS 0
 #endif
 
-struct arm_core_data {
+struct arm_core_data
+{
     uint32_t cycle_count;
     registers reg;
     memory mem;
 };
 
-arm_core arm_create(registers reg, memory mem) {
+arm_core arm_create(registers reg, memory mem)
+{
     arm_core p;
 
     p = malloc(sizeof(struct arm_core_data));
-    if (p) {
+    if (p)
+    {
         p->mem = mem;
         p->reg = reg;
         p->cycle_count = 0;
@@ -65,30 +68,36 @@ arm_core arm_create(registers reg, memory mem) {
     return p;
 }
 
-void arm_destroy(arm_core p) {
+void arm_destroy(arm_core p)
+{
     free(p);
 }
 
-int arm_current_mode_has_spsr(arm_core p) {
+int arm_current_mode_has_spsr(arm_core p)
+{
     return registers_current_mode_has_spsr(p->reg);
 }
 
-int arm_in_a_privileged_mode(arm_core p) {
+int arm_in_a_privileged_mode(arm_core p)
+{
     return registers_in_a_privileged_mode(p->reg);
 }
 
-uint32_t arm_get_cycle_count(arm_core p) {
+uint32_t arm_get_cycle_count(arm_core p)
+{
     return p->cycle_count;
 }
 
-static uint32_t arm_read_register_internal(arm_core p, uint8_t reg, uint8_t mode) {
+static uint32_t arm_read_register_internal(arm_core p, uint8_t reg, uint8_t mode)
+{
     uint32_t value = registers_read(p->reg, reg, mode);
     /* In this implementation, the program counter is incremented during the fetch.
      * Thus, to meet the specification (see manual A2-9), we add 4 whenever the
      * value of the pc is read, so that instructions read their own address + 8 when
      * reading the pc.
      */
-    if (reg == 15) {
+    if (reg == 15)
+    {
         value += 4;
         value &= 0xFFFFFFFD;
     }
@@ -96,51 +105,61 @@ static uint32_t arm_read_register_internal(arm_core p, uint8_t reg, uint8_t mode
     return value;
 }
 
-uint32_t arm_read_register(arm_core p, uint8_t reg) {
+uint32_t arm_read_register(arm_core p, uint8_t reg)
+{
     return arm_read_register_internal(p, reg, registers_get_mode(p->reg));
 }
 
-uint32_t arm_read_usr_register(arm_core p, uint8_t reg) {
+uint32_t arm_read_usr_register(arm_core p, uint8_t reg)
+{
     return arm_read_register_internal(p, reg, USR);
 }
 
-uint32_t arm_read_cpsr(arm_core p) {
+uint32_t arm_read_cpsr(arm_core p)
+{
     uint32_t value = registers_read_cpsr(p->reg);
     trace_register(p->cycle_count, READ, CPSR, 0, value);
     return value;
 }
 
-uint32_t arm_read_spsr(arm_core p) {
+uint32_t arm_read_spsr(arm_core p)
+{
     uint8_t mode = registers_get_mode(p->reg);
     uint32_t value = registers_read_spsr(p->reg, mode);
     trace_register(p->cycle_count, READ, SPSR, mode, value);
     return value;
 }
 
-static void arm_write_register_internal(arm_core p, uint8_t reg, uint8_t mode, uint32_t value) {
+static void arm_write_register_internal(arm_core p, uint8_t reg, uint8_t mode, uint32_t value)
+{
     registers_write(p->reg, reg, mode, value);
     trace_register(p->cycle_count, WRITE, reg, mode, value);
 }
 
-void arm_write_register(arm_core p, uint8_t reg, uint32_t value) {
+void arm_write_register(arm_core p, uint8_t reg, uint32_t value)
+{
     arm_write_register_internal(p, reg, registers_get_mode(p->reg), value);
 }
 
-void arm_write_usr_register(arm_core p, uint8_t reg, uint32_t value) {
+void arm_write_usr_register(arm_core p, uint8_t reg, uint32_t value)
+{
     arm_write_register_internal(p, reg, USR, value);
 }
 
-void arm_write_cpsr(arm_core p, uint32_t value) {
+void arm_write_cpsr(arm_core p, uint32_t value)
+{
     registers_write_cpsr(p->reg, value);
     trace_register(p->cycle_count, WRITE, CPSR, 0, value);
 }
 
-void arm_write_spsr(arm_core p, uint32_t value) {
+void arm_write_spsr(arm_core p, uint32_t value)
+{
     registers_write_spsr(p->reg, registers_get_mode(p->reg), value);
     trace_register(p->cycle_count, WRITE, SPSR, registers_get_mode(p->reg), value);
 }
 
-int arm_read_byte(arm_core p, uint32_t address, uint8_t *value) {
+int arm_read_byte(arm_core p, uint32_t address, uint8_t *value)
+{
     int result;
 
     result = memory_read_byte(p->mem, address, value);
@@ -148,7 +167,8 @@ int arm_read_byte(arm_core p, uint32_t address, uint8_t *value) {
     return result;
 }
 
-int arm_read_half(arm_core p, uint32_t address, uint16_t *value) {
+int arm_read_half(arm_core p, uint32_t address, uint16_t *value)
+{
     int result;
 
     result = memory_read_half(p->mem, address, value, ENDIANESS);
@@ -156,7 +176,8 @@ int arm_read_half(arm_core p, uint32_t address, uint16_t *value) {
     return result;
 }
 
-int arm_read_word(arm_core p, uint32_t address, uint32_t *value) {
+int arm_read_word(arm_core p, uint32_t address, uint32_t *value)
+{
     int result;
 
     result = memory_read_word(p->mem, address, value, ENDIANESS);
@@ -164,10 +185,11 @@ int arm_read_word(arm_core p, uint32_t address, uint32_t *value) {
     return result;
 }
 
-int arm_fetch(arm_core p, uint32_t *value) {
+int arm_fetch(arm_core p, uint32_t *value)
+{
     int result = -1;
     uint32_t address = 0;
-    
+
     /* According to the comment in arm_read_register_internal, the fetch
      * increments the PC (this makes easier the implementation any instruction
      * that changes the PC later on).
@@ -181,7 +203,8 @@ int arm_fetch(arm_core p, uint32_t *value) {
     return result;
 }
 
-int arm_write_byte(arm_core p, uint32_t address, uint8_t value) {
+int arm_write_byte(arm_core p, uint32_t address, uint8_t value)
+{
     int result;
 
     result = memory_write_byte(p->mem, address, value);
@@ -189,7 +212,8 @@ int arm_write_byte(arm_core p, uint32_t address, uint8_t value) {
     return result;
 }
 
-int arm_write_half(arm_core p, uint32_t address, uint16_t value) {
+int arm_write_half(arm_core p, uint32_t address, uint16_t value)
+{
     int result;
 
     result = memory_write_half(p->mem, address, value, ENDIANESS);
@@ -197,7 +221,8 @@ int arm_write_half(arm_core p, uint32_t address, uint16_t value) {
     return result;
 }
 
-int arm_write_word(arm_core p, uint32_t address, uint32_t value) {
+int arm_write_word(arm_core p, uint32_t address, uint32_t value)
+{
     int result;
 
     result = memory_write_word(p->mem, address, value, ENDIANESS);

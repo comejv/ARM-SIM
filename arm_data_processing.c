@@ -226,7 +226,7 @@ int apply_operator(arm_core p, uint32_t ins, uint32_t shifter_operand, uint8_t s
         {
         case 0:
             /* code */
-            cpsr = carryFrom(Rd_value, cpsr); // Update C flag
+            cpsr = carryFrom(Rd_value, cpsr);                             // Update C flag
             cpsr = overflowFrom(Rn_value, shifter_operand, opcode, cpsr); // Update V flag
             break;
         case 1:
