@@ -62,7 +62,12 @@ target remote localhost:<port number given by the simulator>
 set endian big
 c
 ```
+- chenillion.c : A program that show a part of a text rotating in a way that it looks it's wrting on a band of paper rotating.
+- chenillion_rainbow.c : Same as chenillion.c but with colors changing.
+- tictactoe.c : A program to play tic tac toe on the simulator.
+  
 Then for programs that need an user input (tictactoe), you have to put your input in the terminal running the simulator.
+
 ## Acknowledgements
 
 This project uses resources available on [ARM's official website](https://www.arm.com) for the ARMv5 reference manual and `arm-none-eabi-gdb` for debugging capabilities.
