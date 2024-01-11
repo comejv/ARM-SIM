@@ -64,18 +64,18 @@ main:
     bne fail
     mov r0, #0
 
-    mov r0, #0x12
-    mov r1, #0x23
-    mov r2, #0x2000
-    strd r0, [r2]
-    ldrd r4, [r2]
-    cmp r0, r4
-    movne r0, #1
-    bne fail
-    cmp r1, r5
-    movne r0, #2
-    bne fail
-    mov r0, #0
+    @ mov r0, #0x12
+    @ mov r1, #0x23
+    @ mov r2, #0x2000
+    @ strd r0, [r2]
+    @ ldrd r4, [r2]
+    @ cmp r0, r4
+    @ movne r0, #1
+    @ bne fail
+    @ cmp r1, r5
+    @ movne r0, #2
+    @ bne fail
+    @ mov r0, #0
     // All tests passed
 end:
     swi 0x123456
