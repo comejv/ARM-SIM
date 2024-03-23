@@ -53,8 +53,9 @@ Tests are available for these features :
 
 ## Showcases
 
-Programs using the simulator to work, for it to work you have to run `./arm_simulator`
-Then to run the program you want, you use the following commands : 
+A few examples have been created and tailored to showcase the capabilities of our program. They've been written in C and will be compiled by a regular compiler.
+To run the examples you first have to start the simulator with `./arm_simulator`.
+Then to run the showcase you want, you may use the following commands : 
 ```gdb
 arm-none-eabi-gdb
 file Showcase/<program_name>
@@ -62,12 +63,13 @@ target remote localhost:<port number given by the simulator>
 set endian big
 c
 ```
-- chenillion.c : A program that show a part of a text rotating in a way that it looks it's wrting on a band of paper rotating.
-- chenillion_rainbow.c : Same as chenillion.c but with colors changing.
-- tictactoe.c : A program to play tic tac toe on the simulator.
-  
-Then for programs that need an user input (tictactoe), you have to put your input in the terminal running the simulator.
+- chenillion.c and chenillion_rainbow.c : show flowing text on a single line.
+- tictactoe.c : play a 2 players tic tac toe on the simulator.
+- clock.c : self updating text using software interrupts.
+- fibonacci.c : test proper handling of the call stack.
+
+Inputs have to be given to the main simulator program.
 
 ## Acknowledgements
 
-This project uses resources available on [ARM's official website](https://www.arm.com) for the ARMv5 reference manual and `arm-none-eabi-gdb` for debugging capabilities.
+This project uses resources available on [ARM's official website](https://www.arm.com) for the ARMv5 reference manual and `arm-none-eabi-gdb` to read binary files.
